@@ -25,6 +25,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
+        $schedule->command('DeleteDemo:Account')->daily()->at('09:00')->appendOutputTo(storage_path('logs/democron.log'))->runInBackground();
+
     }
 
     /**

@@ -22,6 +22,7 @@ class CreateCustomersTable extends Migration
             $table->timestamp('active_date'); 
             $table->timestamp('plan_expiry_date'); 
             $table->timestamps();
+            $table->timestamp('deleted_at'); 
         });
     }
 

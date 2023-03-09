@@ -6,27 +6,28 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use App\Models\Customer; 
+use App\Models\Customer;
 
 class AuthController extends Controller
 {
     protected $pointHistoryController;
     public function __construct(PointHistoryController $pointHistoryController)
     {
-         $this->pointHistoryController = $pointHistoryController;
-        $this->middleware('auth:api', ['except' => ['login','register', 'changePassword', 'updateUser', 'updatePoints', 'addPoint', 'deleteUser']]);
+        $this->pointHistoryController = $pointHistoryController;
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'changePassword', 'updateUser', 'updatePoints', 'addPoint', 'deleteUser']]);
     }
-     
 
-      
 
-    public function login(Request $request) {
+
+
+    public function login(Request $request)
+    {
         $request->validate([
             'user_name' => 'required|string',
             'password' => 'required|string',
         ]);
         $credentials = $request->only('user_name', 'password');
-        
+
 
         $token = Auth::attempt($credentials);
         if (!$token) {
@@ -36,184 +37,187 @@ class AuthController extends Controller
             ], 401);
         }
         $user = Auth::user();
-        $update = User::where('appId',$user->appId)->update([
-                 'login_status'=>'1'
-           ]); 
-        $data=Customer::where('reseller_id',$user->id)->get();
-            return response()->json([
-                'status' => true,
-                'user' => $user,
-                'customer'=>$data,
-                'policy'=>'https://www.nxtlevel.live/privacy-policy',
-                'message'=> 'Login Successfully',
-                'authorisation' => [
-                    'token' => $token,
-                    'type' => 'bearer',
-                ]
-            ]);
-       
+        $update = User::where('appId', $user->appId)->update([
+            'login_status' => '1'
+        ]);
+        $data = Customer::where('reseller_id', $user->id)->get();
+        return response()->json([
+            'status' => true,
+            'user' => $user,
+            'customer' => $data,
+            'policy' => 'https://www.nxtlevel.live/privacy-policy',
+            'message' => 'Login Successfully',
+            'authorisation' => [
+                'token' => $token,
+                'type' => 'bearer',
+            ]
+        ]);
     }
-    
-    public function updatePoints(string $rId, string $point){
- 
-        $update = User::where('id',$rId)->update([
-            'points'=>$point,
-        ]); 
-        if($update){
-             $data = User::where('appId',$rId)->first();
+
+    public function updatePoints(string $rId, string $point)
+    {
+
+        $update = User::where('id', $rId)->update([
+            'points' => $point,
+        ]);
+        if ($update) {
+            $data = User::where('appId', $rId)->first();
             return true;
         }
-    }  
-    public function changePassword(Request $request){
-        $id = $request->appId; 
-        $update = User::where('appId',$id)->update([
-            'user_name'=>$request->user_name,
-            'password'=> Hash::make($request->password),
-        ]); 
-        if($update){
-             $data = User::where('appId',$id)->first();
+    }
+    public function changePassword(Request $request)
+    {
+        $id = $request->appId;
+        $update = User::where('appId', $id)->update([
+            'user_name' => $request->user_name,
+            'password' => Hash::make($request->password),
+        ]);
+        if ($update) {
+            $data = User::where('appId', $id)->first();
             return response()->json([
                 'status' => true,
-                'data'=>$data,
-                'message'=>'Password Updated Successfully'
+                'data' => $data,
+                'message' => 'Password Updated Successfully'
             ]);
         }
-    }   
-    
-    public function updateUser(Request $request){
-        $id = $request->appId; 
-        $update = User::where('appId',$id)->update([
-            'name'=>$request->name,
-            'user_name'=>$request->user_name,
-            'mobile'=>$request->mobile,
-            'image_index'=>$request->image_index,
-        ]); 
-        if($update){
-             $data = User::where('appId',$id)->first();
+    }
+
+    public function updateUser(Request $request)
+    {
+        $id = $request->appId;
+        $update = User::where('appId', $id)->update([
+            'name' => $request->name,
+            'user_name' => $request->user_name,
+            'mobile' => $request->mobile,
+            'image_index' => $request->image_index,
+        ]);
+        if ($update) {
+            $data = User::where('appId', $id)->first();
             return response()->json([
                 'status' => true,
-                'data'=>$data,
-                'message'=>'User Updated Successfully'
+                'data' => $data,
+                'message' => 'User Updated Successfully'
             ]);
         }
-    }    
-    
-    public function addPoint(Request $request){
-        $id = $request->appId; 
-        $rid = $request->rid; 
+    }
+
+    public function addPoint(Request $request)
+    {
+        $id = $request->appId;
+        $rid = $request->rid;
         $point = $request->points;
         $resellerEndDate = $request->reseller_end_date;
         $userEndDate = $request->user_end_date;
-        
-        $user = User::where('appId',$id)->first();
-        
-        $resellerUser = User::where('id',$rid)->first(); 
+
+        $user = User::where('appId', $id)->first();
+
+        $resellerUser = User::where('id', $rid)->first();
         $resellerUser->end_date = $resellerEndDate;
         $resellerUser->save();
-        
-        
+
+
         $remark = "$point point added by $resellerUser->name to $user->name";
         $result = $this->pointHistoryController->addPoints($resellerUser->id, $user->id, $request->points, $remark);
-        
-        $user->point_history=$result->id;
+
+        $user->point_history = $result->id;
         $user->end_date = $userEndDate;
-        $user->save(); 
+        $user->save();
         return response()->json([
-                'status' => true,
-                'message'=>'Point added Successfully'
-            ]);
-    }   
-    
-  public function reversePoint(Request $request){
-        $id = $request->appId; 
-        $rid = $request->rid; 
+            'status' => true,
+            'message' => 'Point added Successfully'
+        ]);
+    }
+
+    public function reversePoint(Request $request)
+    {
+        $id = $request->appId;
+        $rid = $request->rid;
         $point = $request->points;
         $resellerEndDate = $request->reseller_end_date;
         $userEndDate = $request->user_end_date;
-      
-        $user = User::where('appId',$id)->first();
-        
-        $resellerUser = User::where('id',$rid)->first(); 
+
+        $user = User::where('appId', $id)->first();
+
+        $resellerUser = User::where('id', $rid)->first();
         $resellerUser->end_date = $resellerEndDate;
         $resellerUser->save();
 
-       $remark = "$point point reversed by $resellerUser->name from $user->name";
-       $result = $this->pointHistoryController->addPoints($resellerUser->id, $user->id, $request->points, $remark);
-         
-        $user->point_history="0";
+        $remark = "$point point reversed by $resellerUser->name from $user->name";
+        $result = $this->pointHistoryController->addPoints($resellerUser->id, $user->id, $request->points, $remark);
+
+        $user->point_history = "0";
         $user->end_date = $userEndDate;
         $user->save();
-        if($result){
+        if ($result) {
             return response()->json([
                 'status' => true,
-                 'message'=>'Pointed Reversed Successfully'
+                'message' => 'Pointed Reversed Successfully'
             ]);
-        }else{
-             return response()->json([
-                'status' => false,
-                 'message'=>'Request failed'
-            ]);
-            
-        }
-        
-        
-    }    
-    
-    public function register(Request $request){
-         $user = User::where('user_name',$request->user_name)->first();
-        if($user){
+        } else {
             return response()->json([
                 'status' => false,
-                'message'=>'User already exists'
-            ]); 
+                'message' => 'Request failed'
+            ]);
         }
-        $user = new User; 
-        $user->appId = 'app_'.uniqid(); 
-        $user->name = $request->name; 
-        $user->user_name = $request->user_name; 
+    }
+
+    public function register(Request $request)
+    {
+        $user = User::where('user_name', $request->user_name)->first();
+        if ($user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User already exists'
+            ]);
+        }
+        $user = new User;
+        $user->appId = 'app_' . uniqid();
+        $user->name = $request->name;
+        $user->user_name = $request->user_name;
         $user->password = Hash::make($request->password);
         $user->temp_pass = $request->password;
-        $user->login_status = '0'; 
+        $user->login_status = '0';
         $user->start_date = $request->start_date;
-         $user->end_date = $request->end_date;
-        $user->image_index=$request->image_index;
-        $user->role_id = $request->role_id; 
-        $user->reseller_id = $request->reseller_id; 
+        $user->end_date = $request->end_date;
+        $user->image_index = $request->image_index;
+        $user->role_id = $request->role_id;
+        $user->reseller_id = $request->reseller_id;
         $user->mobile = $request->mobile;
-        $user->save(); 
+        $user->save();
 
-        $resellerName =  User::where('id',$request->reseller_id)->first(); 
-        $resellerName->end_date= $request->reseller_end_date; 
+        $resellerName =  User::where('id', $request->reseller_id)->first();
+        $resellerName->end_date = $request->reseller_end_date;
         $resellerName->save();
-        
+
         $remark = "$request->points point added by $resellerName->name to $request->username";
-        $result = $this->pointHistoryController->addPoints($request->reseller_id,$user->id, $request->points, $remark);  
-        
+        $result = $this->pointHistoryController->addPoints($request->reseller_id, $user->id, $request->points, $remark);
+
         $UpdateDetails = User::where('id', '=',  $user->id)->first();
         $UpdateDetails->point_history = $result->id;
-        $UpdateDetails->save();        
+        $UpdateDetails->save();
         $token = Auth::login($user);
-        
+
         return response()->json([
             'status' => true,
             'message' => 'User created successfully',
             'user' => $user,
             //   'updatedpoin' => $request->points,
-            'policy'=>'https://www.nxtlevel.live/privacy-policy',
+            'policy' => 'https://www.nxtlevel.live/privacy-policy',
             'authorisation' => [
                 'token' => $token,
                 'type' => 'bearer',
             ]
-        ]); 
+        ]);
     }
-    
-    public function logout(Request $request)  {    
-      $user_appId = $request->user_appId;   
 
-      $status = User::where('appId',$user_appId)->get();
-        if(count($status) > 0){
-            $update = User::where('appId',$user_appId)->update([
-                'login_status'=>'0'
+    public function logout(Request $request)
+    {
+        $user_appId = $request->user_appId;
+
+        $status = User::where('appId', $user_appId)->get();
+        if (count($status) > 0) {
+            $update = User::where('appId', $user_appId)->update([
+                'login_status' => '0'
             ]);
         }
         Auth::logout();
@@ -223,17 +227,18 @@ class AuthController extends Controller
         ]);
     }
 
-    public function deleteUser($id){
-        $delete = User::where('id',$id)->delete(); 
-        if($delete){
+    public function deleteUser($id)
+    {
+        $delete = User::where('id', $id)->delete();
+        if ($delete) {
             return response()->json([
                 'status' => true,
-                 'message'=>'User Deleted Successfully'
+                'message' => 'User Deleted Successfully'
             ]);
-        }else{
-             return response()->json([
+        } else {
+            return response()->json([
                 'status' => false,
-                 'message'=>'Request failed'
+                'message' => 'Request failed'
             ]);
         }
     }

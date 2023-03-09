@@ -99,6 +99,11 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+        'democron' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/democron.log'),
+            'level' => 'debug',
+        ],
     ],
 
 ];
