@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Customer;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -29,14 +30,14 @@ class AuthController extends Controller
         $credentials = $request->only('user_name', 'password');
 
 
-        $token = Auth::attempt($credentials);
+        $token = JWTAuth::attempt($credentials);
         if (!$token) {
             return response()->json([
                 'status' => false,
                 'message' => 'token not found',
             ], 401);
         }
-        $user = Auth::user();
+        $user = JWTAuth::user();
         $update = User::where('appId', $user->appId)->update([
             'login_status' => '1'
         ]);
