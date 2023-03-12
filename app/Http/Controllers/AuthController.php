@@ -18,9 +18,6 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['login', 'register', 'changePassword', 'updateUser', 'updatePoints', 'addPoint', 'deleteUser']]);
     }
 
-
-
-
     public function login(Request $request)
     {
         $request->validate([
