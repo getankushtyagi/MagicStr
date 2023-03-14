@@ -15,7 +15,7 @@ class AuthController extends Controller
     public function __construct(PointHistoryController $pointHistoryController)
     {
         $this->pointHistoryController = $pointHistoryController;
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'changePassword', 'updateUser', 'updatePoints', 'addPoint', 'deleteUser']]);
+        // $this->middleware('auth:api', ['except' => ['login', 'register', 'changePassword', 'updateUser', 'updatePoints', 'addPoint', 'deleteUser']]);
     }
 
     public function login(Request $request)
@@ -23,33 +23,76 @@ class AuthController extends Controller
         $request->validate([
             'user_name' => 'required|string',
             'password' => 'required|string',
+            'platform' => 'required|string',
         ]);
-        $credentials = $request->only('user_name', 'password');
 
+        $credentials = $request->only('user_name', 'password', 'platform');
 
-        $token = JWTAuth::attempt($credentials);
-        if (!$token) {
+        $checkplatform = User::select('id', 'platform')
+            ->where('user_name', $credentials['user_name'])
+            ->first();
+        // dd($checkplatform['platform']);
+
+        if ($checkplatform['platform'] == 'ios' || $checkplatform['platform'] == 'mac') {
+            // dd('iside');
+            $token = JWTAuth::attempt($credentials);
+            if (!$token) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'token not found',
+                ], 401);
+            }
+            $user = JWTAuth::user();
+            $update = User::where('appId', $user->appId)->update([
+                'login_status' => '1'
+            ]);
+            $data = Customer::where('reseller_id', $user->id)->get();
             return response()->json([
-                'status' => false,
-                'message' => 'token not found',
-            ], 401);
+                'status' => true,
+                'user' => $user,
+                'customer' => $data,
+                'policy' => 'https://www.nxtlevel.live/privacy-policy',
+                'message' => 'Login Successfully',
+                'authorisation' => [
+                    'token' => $token,
+                    'type' => 'bearer',
+                ]
+            ]);
+        } else {
+            if ($credentials['platform'] == 'windows' || $credentials['platform'] == 'android') {
+                $token = JWTAuth::attempt(['user_name' => $credentials['user_name'], 'password' => $credentials['password']]);
+                // dd('if',$token);
+                if (!$token) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'token not found',
+                    ], 401);
+                }
+                $user = JWTAuth::user();
+                $update = User::where('appId', $user->appId)->update([
+                    'login_status' => '1'
+                ]);
+                $data = Customer::where('reseller_id', $user->id)->get();
+                return response()->json([
+                    'status' => true,
+                    'user' => $user,
+                    'customer' => $data,
+                    'policy' => 'https://www.nxtlevel.live/privacy-policy',
+                    'message' => 'Login Successfully',
+                    'authorisation' => [
+                        'token' => $token,
+                        'type' => 'bearer',
+                    ]
+                ]);
+            } else {
+                // dd('else');
+                return response()->json([
+                    'status' => true,
+                    'message' => 'You are not allowed to login in this platform'
+
+                ]);
+            }
         }
-        $user = JWTAuth::user();
-        $update = User::where('appId', $user->appId)->update([
-            'login_status' => '1'
-        ]);
-        $data = Customer::where('reseller_id', $user->id)->get();
-        return response()->json([
-            'status' => true,
-            'user' => $user,
-            'customer' => $data,
-            'policy' => 'https://www.nxtlevel.live/privacy-policy',
-            'message' => 'Login Successfully',
-            'authorisation' => [
-                'token' => $token,
-                'type' => 'bearer',
-            ]
-        ]);
     }
 
     public function updatePoints(string $rId, string $point)
@@ -181,6 +224,8 @@ class AuthController extends Controller
         $user->role_id = $request->role_id;
         $user->reseller_id = $request->reseller_id;
         $user->mobile = $request->mobile;
+        //platform type:- ios/android/mac/windows
+        $user->platform = $request->platform;
         $user->save();
 
         $resellerName =  User::where('id', $request->reseller_id)->first();
