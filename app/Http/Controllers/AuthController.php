@@ -35,7 +35,7 @@ class AuthController extends Controller
 
         if ($checkplatform['platform'] == 'ios' || $checkplatform['platform'] == 'mac') {
             // dd('iside');
-            $token = JWTAuth::attempt($credentials);
+                $token = JWTAuth::attempt(['user_name' => $credentials['user_name'], 'password' => $credentials['password']]);
             if (!$token) {
                 return response()->json([
                     'status' => false,
