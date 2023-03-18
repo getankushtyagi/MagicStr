@@ -106,6 +106,7 @@ class AuthController extends Controller
             return true;
         }
     }
+    
     public function changePassword(Request $request)
     {
         $id = $request->appId;
@@ -285,6 +286,7 @@ class AuthController extends Controller
             ]);
         }
     }
+
     public function refresh()
     {
         return response()->json([
