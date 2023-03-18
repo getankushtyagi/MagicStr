@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Customer;
+use Exception;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -20,48 +21,23 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
-            'user_name' => 'required|string',
-            'password' => 'required|string',
-            'platform' => 'required|string',
-        ]);
-
-        $credentials = $request->only('user_name', 'password', 'platform');
-
-        $checkplatform = User::select('id', 'platform')
-            ->where('user_name', $credentials['user_name'])
-            ->first();
-        // dd($checkplatform['platform']);
-
-        if ($checkplatform['platform'] == 'ios' || $checkplatform['platform'] == 'mac') {
-            // dd('iside');
-                $token = JWTAuth::attempt(['user_name' => $credentials['user_name'], 'password' => $credentials['password']]);
-            if (!$token) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'token not found',
-                ], 401);
-            }
-            $user = JWTAuth::user();
-            $update = User::where('appId', $user->appId)->update([
-                'login_status' => '1'
+        try {
+            $request->validate([
+                'user_name' => 'required|string',
+                'password' => 'required|string',
+                'platform' => 'required|string',
             ]);
-            $data = Customer::where('reseller_id', $user->id)->get();
-            return response()->json([
-                'status' => true,
-                'user' => $user,
-                'customer' => $data,
-                'policy' => 'https://www.nxtlevel.live/privacy-policy',
-                'message' => 'Login Successfully',
-                'authorisation' => [
-                    'token' => $token,
-                    'type' => 'bearer',
-                ]
-            ]);
-        } else {
-            if ($credentials['platform'] == 'windows' || $credentials['platform'] == 'android') {
+
+            $credentials = $request->only('user_name', 'password', 'platform');
+
+            $checkplatform = User::select('id', 'platform')
+                ->where('user_name', $credentials['user_name'])
+                ->first();
+            // dd($checkplatform['platform']);
+
+            if ($checkplatform['platform'] == 'ios' || $checkplatform['platform'] == 'mac') {
+                // dd('iside');
                 $token = JWTAuth::attempt(['user_name' => $credentials['user_name'], 'password' => $credentials['password']]);
-                // dd('if',$token);
                 if (!$token) {
                     return response()->json([
                         'status' => false,
@@ -85,13 +61,42 @@ class AuthController extends Controller
                     ]
                 ]);
             } else {
-                // dd('else');
-                return response()->json([
-                    'status' => true,
-                    'message' => 'You are not allowed to login in this platform'
+                if ($credentials['platform'] == 'windows' || $credentials['platform'] == 'android') {
+                    $token = JWTAuth::attempt(['user_name' => $credentials['user_name'], 'password' => $credentials['password']]);
+                    // dd('if',$token);
+                    if (!$token) {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'token not found',
+                        ], 401);
+                    }
+                    $user = JWTAuth::user();
+                    $update = User::where('appId', $user->appId)->update([
+                        'login_status' => '1'
+                    ]);
+                    $data = Customer::where('reseller_id', $user->id)->get();
+                    return response()->json([
+                        'status' => true,
+                        'user' => $user,
+                        'customer' => $data,
+                        'policy' => 'https://www.nxtlevel.live/privacy-policy',
+                        'message' => 'Login Successfully',
+                        'authorisation' => [
+                            'token' => $token,
+                            'type' => 'bearer',
+                        ]
+                    ]);
+                } else {
+                    // dd('else');
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'You are not allowed to login in this platform'
 
-                ]);
+                    ]);
+                }
             }
+        } catch (Exception $e) {
+            dd($e);
         }
     }
 
@@ -106,7 +111,7 @@ class AuthController extends Controller
             return true;
         }
     }
-    
+
     public function changePassword(Request $request)
     {
         $id = $request->appId;
