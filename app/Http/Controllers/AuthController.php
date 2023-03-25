@@ -256,19 +256,29 @@ class AuthController extends Controller
         $user->name = $request->name;
         $user->user_name = $request->user_name;
         $user->password = Hash::make($request->password);
+
+        //remove temp_pass
         $user->temp_pass = $request->password;
+        //remove login_status
         $user->login_status = '0';
+        //remove start date end date
         $user->start_date = $request->start_date;
         $user->end_date = $request->end_date;
         $user->image_index = $request->image_index;
-        $user->role_id = $request->role_id;
+        $user->role_id = $request->role_id??1;
         $user->reseller_id = $request->reseller_id;
         $user->mobile = $request->mobile;
-        //platform type:- ios/android/mac/windows
-        $user->platform = $request->platform;
+        //platform:- ios/android
+        // $user->platform = $request->platform;
+
+        // point is comming from front-end
+
+
         $user->save();
 
         $resellerName =  User::where('id', $request->reseller_id)->first();
+
+        //remove reseller endate
         $resellerName->end_date = $request->reseller_end_date;
         $resellerName->save();
 

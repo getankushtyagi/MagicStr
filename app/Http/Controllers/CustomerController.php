@@ -42,15 +42,26 @@ class CustomerController extends Controller
         $data->username = $request->username;
         $data->password = $request->password;
         $data->reseller_id = $request->reseller_id;
+
+        //remove active date
         $data->active_date = $request->active_date;
         $dat=$request->active_date;
-        //expiry date is manage from backend
-        $addexpiredate=strtotime($dat.'+30 days');
+
+        //point is coming from front-end
+
+        // expiry date is manage from backend
+
+        //fix 
+        $addexpiredate=strtotime($dat.'+1 days');
         $addexpiredateformat=Date('Y-m-d h:i:s',$addexpiredate);
+
+        //remove this
         $data->plan_expiry_date = $addexpiredateformat;
         $data->save();
 
         $resellerName =  User::where('id', $request->reseller_id)->first();
+
+        //remove reseller endate
         $resellerName->end_date = $request->reseller_end_date;
         $resellerName->save();
 
@@ -138,6 +149,40 @@ class CustomerController extends Controller
             ]);
         }
     }
+    public function addCustomerPoints_bk(Request $request)
+    {
+        $id = $request->appId;
+        $rid = $request->rid;
+        $point = $request->points;
+        $resellerEndDate = $request->reseller_end_date;
+        $userEndDate = $request->user_end_date;
+        $point_type = $request->point_type??"ios";
+
+
+        $user = Customer::where('appId', $id)->first();
+
+        $resellerUser = User::where('id', $rid)->first();
+        $resellerUser->end_date = $resellerEndDate;
+        $resellerUser->save();
+
+
+        $remark = "$point point added by $resellerUser->name to $user->name";
+        $result = $this->pointHistoryController->addPoints($resellerUser->id, $user->id, $request->points, $remark,$point_type);
+        $user->point_reverse = $result->id;
+        $user->plan_expiry_date = $userEndDate;
+        $user->save();
+        if ($result) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Pointed Added Successfully'
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Request failed'
+            ]);
+        }
+    }
 
     public function changePaymentStatus(Request $request)
     {
@@ -149,7 +194,7 @@ class CustomerController extends Controller
         $result = $this->paymentController->addPaymentStatus($cid, $rid, $status, $remarks);
 
         $update = Customer::where('id', $cid)->update([
-            'pstatus' => $cid
+            'pstatus' => $cid??0
         ]);
 
         if ($update) {
