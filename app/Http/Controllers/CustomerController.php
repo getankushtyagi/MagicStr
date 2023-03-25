@@ -218,6 +218,7 @@ class CustomerController extends Controller
     {
         $name = $request->username;
         $password = $request->password;
+        $platform = $request->platform??"ios";
 
         $user = Customer::where('username', $name)->first();
         if ($user->password == $password) {
