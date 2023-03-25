@@ -9,12 +9,17 @@ class PointHistoryController extends Controller
 {
     
  
- public function addPoints(string $rId, string $cId, string $point, string $remarks){
+ public function addPoints(string $rId, string $cId, string $point, string $remarks, $point_type=null){
         $data = new PointHistory; 
         $data->reseller_id = $rId; 
         $data->customer_id = $cId; 
         $data->points = $point; 
         $data->remarks = $remarks; 
+        if(isset($point_type) && $point_type == "ios"){
+            $data->ios_point = $point; 
+        }elseif(isset($point_type) && $point_type == "android"){
+            $data->android_point = $point; 
+        }
         $data->save(); 
         if($data){
             return $data;

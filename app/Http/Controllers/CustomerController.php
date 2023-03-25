@@ -111,6 +111,7 @@ class CustomerController extends Controller
         $point = $request->points;
         $resellerEndDate = $request->reseller_end_date;
         $userEndDate = $request->user_end_date;
+        $point_type = $request->point_type??"ios";
 
 
         $user = Customer::where('appId', $id)->first();
@@ -121,8 +122,7 @@ class CustomerController extends Controller
 
 
         $remark = "$point point added by $resellerUser->name to $user->name";
-        $result = $this->pointHistoryController->addPoints($resellerUser->id, $user->id, $request->points, $remark);
-
+        $result = $this->pointHistoryController->addPoints($resellerUser->id, $user->id, $request->points, $remark,$point_type);
         $user->point_reverse = $result->id;
         $user->plan_expiry_date = $userEndDate;
         $user->save();

@@ -67,10 +67,10 @@ Route::group(['middleware' => ['jwt.verify']], function () {
     Route::post('customer/bulk/delete', [CustomerController::class, 'bulkDeleteCustomer']);
 
     Route::post('customer/login', [CustomerController::class, 'customerLogin']);
+    Route::post('customer/add_point', [CustomerController::class, 'addCustomerPoints']);
     Route::get('customer/all', [CustomerController::class, 'showAllCustomer']);
     Route::post('customer/update', [CustomerController::class, 'updateCustomer']);
     Route::post('customer/change_password', [CustomerController::class, 'changePassword']);
-    Route::post('customer/add_point', [CustomerController::class, 'addCustomerPoints']);
 
 
     Route::get('reseller/all', [ResellerController::class, 'allReseller']);
