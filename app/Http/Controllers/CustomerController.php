@@ -219,7 +219,151 @@ class CustomerController extends Controller
         $name = $request->username;
         $password = $request->password;
         $platform = $request->platform??"ios";
-
+        
+        if($platform == "ios" || $platform == "mac"){
+            // dump('if');
+            $user = Customer::where('username', $name)->first();
+            // dump($user);
+            if ($user->password == $password) {
+                
+                $customerpoint=PointHistory::select('id','customer_id','reseller_id','ios_point','android_point')
+                ->where('customer_id',$user->id)
+                ->where('reseller_id',$user->reseller_id)
+                ->first();
+                // dd($customerpoint);
+                if(isset($customerpoint->ios_point) && $customerpoint->ios_point > 0){
+                    //customer type 2-> paid 3-> demo 
+                    if ($user->customer_type == 2 || $user->customer_type == 3) {
+                        $meeting = Meeting::all();
+                        return response()->json([
+                            'success' => true,
+                            'message' => 'Login Successfully',
+                            'user' => $user,
+                            'policy' => 'https://www.nxtlevel.live/privacy-policy',
+                            'meeting' => $meeting
+                        ], 200);
+                    } else if ($user->customer_type == 1) { //customer type 1-> apple user
+                        $date = Carbon::now();
+                        $meeting1 = [
+                            "id" => "32",
+                            "name" => "Rakesh",
+                            "session" => "morning",
+                            "duration" => "1 hours",
+                            "subject" => "Mathematics",
+                            "period" => "8-12",
+                            "start_date" => $date->addDays(2),
+                        ];
+                        $meeting2 = [
+                            "id" => "33",
+                            "name" => "Mohit",
+                            "session" => "evening",
+                            "duration" => "1 hours",
+                            "subject" => "Science",
+                            "period" => "8-12",
+                            "start_date" => $date->addDays(2),
+                        ];
+                        $meetings = [$meeting1, $meeting2];
+                        return response()->json([
+                            'status' => true,
+                            'data' => $user,
+                            'policy' => 'https://www.nxtlevel.live/privacy-policy',
+                            'meetings' => $meetings,
+                            'message' => 'Login Successfully'
+                        ]);
+                    } else {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Login  failed',
+                        ], 400);
+                    }
+                }else{
+                    return response()->json([
+                        'success'=>true,
+                        'message'=>"do not have enough point to login"
+                    ]);
+                }
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Login  fail!',
+                ], 400);
+            }
+        }else{
+            // dump('else');
+            $user = Customer::where('username', $name)->first();
+            // dump($user);
+            if ($user->password == $password) {
+                
+                $customerpoint=PointHistory::select('id','customer_id','reseller_id','android_point','ios_point')
+                ->where('customer_id',$user->id)
+                ->where('reseller_id',$user->reseller_id)
+                ->first();
+                // dd($customerpoint);
+                if((isset($customerpoint->ios_point) && $customerpoint->ios_point > 0) || (isset($customerpoint->android_point) && $customerpoint->android_point > 0)){
+                    //customer type 2-> paid 3-> demo 
+                    if ($user->customer_type == 2 || $user->customer_type == 3) {
+                        $meeting = Meeting::all();
+                        return response()->json([
+                            'success' => true,
+                            'message' => 'Login Successfully',
+                            'user' => $user,
+                            'policy' => 'https://www.nxtlevel.live/privacy-policy',
+                            'meeting' => $meeting
+                        ], 200);
+                    } else if ($user->customer_type == 1) { //customer type 1-> apple user
+                        $date = Carbon::now();
+                        $meeting1 = [
+                            "id" => "32",
+                            "name" => "Rakesh",
+                            "session" => "morning",
+                            "duration" => "1 hours",
+                            "subject" => "Mathematics",
+                            "period" => "8-12",
+                            "start_date" => $date->addDays(2),
+                        ];
+                        $meeting2 = [
+                            "id" => "33",
+                            "name" => "Mohit",
+                            "session" => "evening",
+                            "duration" => "1 hours",
+                            "subject" => "Science",
+                            "period" => "8-12",
+                            "start_date" => $date->addDays(2),
+                        ];
+                        $meetings = [$meeting1, $meeting2];
+                        return response()->json([
+                            'status' => true,
+                            'data' => $user,
+                            'policy' => 'https://www.nxtlevel.live/privacy-policy',
+                            'meetings' => $meetings,
+                            'message' => 'Login Successfully'
+                        ]);
+                    } else {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Login  failed',
+                        ], 400);
+                    }
+                }else{
+                    return response()->json([
+                        'success'=>true,
+                        'message'=>"do not have enough point to login"
+                    ]);
+                }
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Login  fail!',
+                ], 400);
+            }
+        }
+    }
+    public function customerLogin_bk(Request $request)
+    {
+        $name = $request->username;
+        $password = $request->password;
+        $platform = $request->platform??"ios";
+        
         $user = Customer::where('username', $name)->first();
         if ($user->password == $password) {
             //customer type 2-> paid 3-> demo 

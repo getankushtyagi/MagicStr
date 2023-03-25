@@ -38,7 +38,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::post('login', [AuthController::class, 'login']);
 Route::post('register', [AuthController::class, 'register']);
 
-Route::group(['middleware' => ['jwt.verify']], function () {
+// Route::group(['middleware' => ['jwt.verify']], function () {
 
     Route::post('changePassword', [AuthController::class, 'changePassword']);
     Route::post('updateUser', [AuthController::class, 'updateUser']);
@@ -93,4 +93,4 @@ Route::group(['middleware' => ['jwt.verify']], function () {
 
     Route::get('payment/history', [PaymentController::class, 'fetchPaymentHistory']);
     Route::post('customer/payment', [CustomerController::class, 'changePaymentStatus']);
-});
+// });
