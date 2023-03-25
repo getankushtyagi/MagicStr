@@ -186,6 +186,63 @@ class AuthController extends Controller
     {
         $id = $request->appId;
         $rid = $request->rid;
+        $point = $request->points??0;
+        $platform = $request->platform;
+        
+        $user = User::where('appId', $id)->first();
+        
+        if ($platform == "ios") {
+            $user->ios_point += $point??0;
+        } else {
+            $user->android_point += $point ?? 0;
+        }
+
+        $existing_reseller = User::where('id', $rid)->first();
+       
+        if($existing_reseller->role_id == "0"){
+            $user->save();
+            $remark = "$point point added by $existing_reseller->name to $request->user_name";
+            $result = $this->pointHistoryController->addPoints($request->rid, $user->id, $point, $remark,$platform);
+    
+            return response()->json([
+                'status' => true,
+                'message' => 'Point added Successfully'
+            ]);
+        }else{
+            $addpoint=$request->points;
+            if($platform=="ios"){
+                $existing_reseller_point=$existing_reseller->ios_point;
+                if($addpoint > $existing_reseller_point){
+                    return response()->json(["message"=>"you do not have enough point to add"]);
+                }else{
+                    $existing_reseller->ios_point -= $addpoint;
+                    $existing_reseller->save();
+                }
+
+            }else{
+                $existing_reseller_point=$existing_reseller->android_point;
+                if($addpoint > $existing_reseller_point){
+                    return response()->json(["message"=>"you do not have enough point to add"]);
+                }else{
+                    $existing_reseller->android_point -= $addpoint;
+                    $existing_reseller->save();
+                }
+
+            }
+            $user->save();
+            $remark = "$request->points point added by $existing_reseller->name to $request->user_name";
+            $result = $this->pointHistoryController->addPoints($request->reseller_id, $user->id, $request->points, $remark,$platform);    
+            return response()->json([
+                'status' => true,
+                'message' => 'Point added Successfully'
+            ]);
+        }
+        
+    }
+    public function addPoint_bk(Request $request)
+    {
+        $id = $request->appId;
+        $rid = $request->rid;
         $point = $request->points;
         $resellerEndDate = $request->reseller_end_date;
         $userEndDate = $request->user_end_date;
@@ -214,20 +271,20 @@ class AuthController extends Controller
         $id = $request->appId;
         $rid = $request->rid;
         $point = $request->points;
-        $resellerEndDate = $request->reseller_end_date;
-        $userEndDate = $request->user_end_date;
+        // $resellerEndDate = $request->reseller_end_date;
+        // $userEndDate = $request->user_end_date;
 
         $user = User::where('appId', $id)->first();
 
         $resellerUser = User::where('id', $rid)->first();
-        $resellerUser->end_date = $resellerEndDate;
+        // $resellerUser->end_date = $resellerEndDate;
         $resellerUser->save();
 
         $remark = "$point point reversed by $resellerUser->name from $user->name";
         $result = $this->pointHistoryController->addPoints($resellerUser->id, $user->id, $request->points, $remark);
 
         $user->point_history = "0";
-        $user->end_date = $userEndDate;
+        // $user->end_date = $userEndDate;
         $user->save();
         if ($result) {
             return response()->json([
@@ -245,6 +302,111 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $user = User::where('user_name', $request->user_name)->first();
+
+        if ($user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User already exists'
+            ]);
+        }
+        $user = new User;
+        $user->appId = 'app_' . uniqid();
+        $user->name = $request->name ?? "";
+        $user->user_name = $request->user_name;
+        $user->password = Hash::make($request->password);
+
+        //remove temp_pass
+            // $user->temp_pass = $request->password;
+        //remove login_status
+            // $user->login_status = '0';
+        //remove start date end date
+            // $user->start_date = $request->start_date;
+            // $user->end_date = $request->end_date;
+
+        $user->image_index = $request->image_index ?? 0;
+        $user->role_id = $request->role_id ?? 1;
+        $user->reseller_id = $request->reseller_id;
+        $user->mobile = $request->mobile;
+
+        // point is comming from front-end
+        $platform = $request->platform; //platform:- ios/android
+
+        if ($platform == "ios") {
+            $user->ios_point = $request->points ?? 0;
+        } else {
+            $user->android_point = $request->points ?? 0;
+        }
+        
+        $existing_reseller =  User::where('id', $request->reseller_id)->first();
+        // dd($existing_reseller);
+        //remove reseller endate
+        // $existing_reseller->end_date = $request->reseller_end_date;
+        if($existing_reseller->role_id == "0"){
+            $user->save();
+            $remark = "$request->points point added by $existing_reseller->name to $request->user_name";
+            $result = $this->pointHistoryController->addPoints($request->reseller_id, $user->id, $request->points, $remark,$platform);
+            // $UpdateDetails = User::where('id', '=',  $user->id)->first();
+            // $UpdateDetails->point_history = $result->id;
+            // $UpdateDetails->save();
+            $token = Auth::login($user);
+    
+            return response()->json([
+                'status' => true,
+                'message' => 'User created successfully',
+                'user' => $user,
+                //   'updatedpoin' => $request->points,
+                'policy' => 'https://www.nxtlevel.live/privacy-policy',
+                'authorisation' => [
+                    'token' => $token,
+                    'type' => 'bearer',
+                ]
+            ]);
+        }else{
+            $addpoint=$request->points;
+            if($platform=="ios"){
+                $existing_reseller_point=$existing_reseller->ios_point;
+                if($addpoint > $existing_reseller_point){
+                    return response()->json(["message"=>"you do not have enough point to add"]);
+                }else{
+                    $existing_reseller->ios_point -= $addpoint;
+                    $existing_reseller->save();
+                }
+
+            }else{
+                $existing_reseller_point=$existing_reseller->android_point;
+                if($addpoint > $existing_reseller_point){
+                    return response()->json(["message"=>"you do not have enough point to add"]);
+                }else{
+                    $existing_reseller->android_point -= $addpoint;
+                    $existing_reseller->save();
+                }
+
+            }
+            // dd($existing_reseller->name);
+            $user->save();
+            $remark = "$request->points point added by $existing_reseller->name to $request->user_name";
+            $result = $this->pointHistoryController->addPoints($request->reseller_id, $user->id, $request->points, $remark,$platform);
+            // $UpdateDetails = User::where('id', '=',  $user->id)->first();
+            // $UpdateDetails->point_history = $result->id;
+            // $UpdateDetails->save();
+            $token = Auth::login($user);
+    
+            return response()->json([
+                'status' => true,
+                'message' => 'User created successfully',
+                'user' => $user,
+                //   'updatedpoin' => $request->points,
+                'policy' => 'https://www.nxtlevel.live/privacy-policy',
+                'authorisation' => [
+                    'token' => $token,
+                    'type' => 'bearer',
+                ]
+            ]);
+        }
+    }
+    public function register_bk(Request $request)
+    {
+        $user = User::where('user_name', $request->user_name)->first();
         if ($user) {
             return response()->json([
                 'status' => false,
@@ -256,29 +418,19 @@ class AuthController extends Controller
         $user->name = $request->name;
         $user->user_name = $request->user_name;
         $user->password = Hash::make($request->password);
-
-        //remove temp_pass
         $user->temp_pass = $request->password;
-        //remove login_status
         $user->login_status = '0';
-        //remove start date end date
         $user->start_date = $request->start_date;
         $user->end_date = $request->end_date;
         $user->image_index = $request->image_index;
-        $user->role_id = $request->role_id??1;
+        $user->role_id = $request->role_id;
         $user->reseller_id = $request->reseller_id;
         $user->mobile = $request->mobile;
-        //platform:- ios/android
+        //platform type:- ios/android/mac/windows
         // $user->platform = $request->platform;
-
-        // point is comming from front-end
-
-
         $user->save();
 
         $resellerName =  User::where('id', $request->reseller_id)->first();
-
-        //remove reseller endate
         $resellerName->end_date = $request->reseller_end_date;
         $resellerName->save();
 

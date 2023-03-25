@@ -11,6 +11,7 @@ use App\Models\Meeting;
 use App\Models\PointHistory;
 use App\Models\User;
 use App\Models\Payment;
+use Exception;
 
 class CustomerController extends Controller
 {
@@ -27,6 +28,106 @@ class CustomerController extends Controller
 
     public function storeCustomer(Request $request)
     {
+        try {
+            $user = Customer::where('username', $request->username)->first();
+            if ($user) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'User Already Registered'
+                ]);
+            }
+
+            $data = new Customer;
+            $data->appId = 'app_' . uniqid();
+            $data->name = $request->name;
+            $data->customer_type = $request->customer_type;
+            $data->username = $request->username;
+            // $data->password = $request->password;
+            $data->password = Hash::make($request->password);
+            $data->reseller_id = $request->reseller_id;
+            $platform = $request->platform;
+
+            if ($platform == "ios") {
+                $currentdate = Date('Y-m-d h:i:s');
+                $daysexpire = $request->points * 30;
+                $expiredate = strtotime($currentdate . '+ ' . $daysexpire . ' days');
+                // dd(Date('Y-m-d h:i:s', $expiredate));
+                $expiredateformat= Date('Y-m-d h:i:s', $expiredate)??"";
+                $data->ios_point_expiry =$expiredateformat;
+            } else {
+                $currentdate = Date('Y-m-d h:i:s');
+                $daysexpire = $request->points * 30;
+                $expiredate = strtotime($currentdate . '+ ' . $daysexpire . ' days');
+                $data->android_point_expiry =Date('Y-m-d h:i:s', $expiredate)??null;
+            }
+
+            $data->save();
+            $existing_reseller =  User::where('id', $request->reseller_id)->first();
+            if($existing_reseller->role_id == "0"){
+                $data->save();
+                $remark = "$request->points point added by $existing_reseller->name to $request->username";
+                $result = $this->pointHistoryController->addPoints($request->reseller_id, $data->id, $request->points, $remark,$platform);
+                
+            }else{
+                $addpoint=$request->points;
+                if($platform=="ios"){
+                    $existing_reseller_point=$existing_reseller->ios_point;
+                    if($addpoint > $existing_reseller_point){
+                        return response()->json(["message"=>"you do not have enough point to add"]);
+                    }else{
+                        $existing_reseller->ios_point -= $addpoint;
+                        $existing_reseller->save();
+                    }
+    
+                }else{
+                    $existing_reseller_point=$existing_reseller->android_point;
+                    if($addpoint > $existing_reseller_point){
+                        return response()->json(["message"=>"you do not have enough point to add"]);
+                    }else{
+                        $existing_reseller->android_point -= $addpoint;
+                        $existing_reseller->save();
+                    }
+    
+                }
+                $data->save();
+                $remark = "$request->points point added by $existing_reseller->name to $request->username";
+                $result = $this->pointHistoryController->addPoints($request->reseller_id, $data->id, $request->points, $remark,$platform);
+              
+            }
+
+            $UpdateDetails = Customer::where('id', '=',  $data->id)->first();
+            $UpdateDetails->point_reverse = $result->id; //point history row id 
+            $UpdateDetails->save();
+
+            if ($data && $request->customer_type == 2 || $data && $request->customer_type == 3) {
+                $meeting = Meeting::all();
+                return response()->json([
+                    'status' => true,
+                    'data' => $data,
+                    'pointh' => $result,
+                    'policy' => 'https://www.nxtlevel.live/privacy-policy',
+                    'meeting' => $meeting,
+                    'message' => 'New Customer Created Successfully'
+                ]);
+            } else if ($request->customer_type == 1) {
+                return response()->json([
+                    'status' => true,
+                    'data' => $data,
+                    'message' => 'New Customer Created Successfully'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data not found'
+                ]);
+            }
+        } catch (Exception $e) {
+            dd($e);
+        }
+    }
+
+    public function storeCustomer_bk(Request $request)
+    {
         $user = Customer::where('username', $request->username)->first();
         if ($user) {
             return response()->json([
@@ -42,26 +143,15 @@ class CustomerController extends Controller
         $data->username = $request->username;
         $data->password = $request->password;
         $data->reseller_id = $request->reseller_id;
-
-        //remove active date
         $data->active_date = $request->active_date;
-        $dat=$request->active_date;
-
-        //point is coming from front-end
-
-        // expiry date is manage from backend
-
-        //fix 
-        $addexpiredate=strtotime($dat.'+1 days');
-        $addexpiredateformat=Date('Y-m-d h:i:s',$addexpiredate);
-
-        //remove this
+        $dat = $request->active_date;
+        //expiry date is manage from backend
+        $addexpiredate = strtotime($dat . '+30 days');
+        $addexpiredateformat = Date('Y-m-d h:i:s', $addexpiredate);
         $data->plan_expiry_date = $addexpiredateformat;
         $data->save();
 
         $resellerName =  User::where('id', $request->reseller_id)->first();
-
-        //remove reseller endate
         $resellerName->end_date = $request->reseller_end_date;
         $resellerName->save();
 
@@ -72,7 +162,7 @@ class CustomerController extends Controller
         $result = $this->pointHistoryController->addPoints($request->reseller_id, $data->id, $request->points, $remark);
 
         $UpdateDetails = Customer::where('id', '=',  $data->id)->first();
-        $UpdateDetails->point_reverse = $result->id;//point history row id 
+        $UpdateDetails->point_reverse = $result->id; //point history row id 
         $UpdateDetails->save();
 
         if ($data && $request->customer_type == 2 || $data && $request->customer_type == 3) {
@@ -120,23 +210,106 @@ class CustomerController extends Controller
         $id = $request->appId;
         $rid = $request->rid;
         $point = $request->points;
-        $resellerEndDate = $request->reseller_end_date;
-        $userEndDate = $request->user_end_date;
-        $point_type = $request->point_type??"ios";
+        $platform = $request->platform ?? "ios";
+
+        $customer_detail = Customer::where('appId', $id)->first();
+        // dd($customer_detail);
+        if ($platform == "ios") {
+            $existingexpirydateios = $customer_detail->ios_point_expiry;
+            if ($existingexpirydateios == null) {
+                // dump('if');
+                $currentdate = Date('Y-m-d h:i:s');
+                $daysexpire = $request->points * 30;
+                $expiredate = strtotime($currentdate . '+ ' . $daysexpire . ' days');
+                $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
+                $customer_detail->ios_point_expiry = $expiredateformat;
+            } else {
+                // dump('else');
+                $currentdate = $existingexpirydateios;
+                $daysexpire = $request->points * 30;
+                $expiredate = strtotime($currentdate . '+ ' . $daysexpire . ' days');
+                $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
+                $customer_detail->ios_point_expiry = $expiredateformat;
+            }
+
+            //update android also
+            $existingexpirydateandroid = $customer_detail->android_point_expiry;
+            if ($existingexpirydateandroid == null) {
+                // dump('android if');
+                $currentdate = Date('Y-m-d h:i:s');
+                $daysexpire = $request->points * 30;
+                $expiredate = strtotime($currentdate . '+ ' . $daysexpire . ' days');
+                $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
+                $customer_detail->android_point_expiry = $expiredateformat;
+            } else {
+                // dump('android else');
+                $currentdate = $existingexpirydateandroid;
+                $daysexpire = $request->points * 30;
+                $expiredate = strtotime($currentdate . '+ ' . $daysexpire . ' days');
+                $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
+                $customer_detail->android_point_expiry = $expiredateformat;
+            }
+        } else {
+            $existingexpirydate = $customer_detail->android_point_expiry;
+            if ($existingexpirydate == null) {
+                $currentdate = Date('Y-m-d h:i:s');
+                $daysexpire = $request->points * 30;
+                $expiredate = strtotime($currentdate . '+ ' . $daysexpire . ' days');
+                $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
+                $customer_detail->ios_point_expiry = $expiredateformat;
+            } else {
+                $currentdate = $existingexpirydate;
+                $daysexpire = $request->points * 30;
+                $expiredate = strtotime($currentdate . '+ ' . $daysexpire . ' days');
+                $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
+                $customer_detail->ios_point_expiry = $expiredateformat;
+            }
+        }
 
 
-        $user = Customer::where('appId', $id)->first();
+        $existing_reseller = User::where('id', $rid)->first();
+        // dd($existing_reseller);
+        if($existing_reseller->role_id == "0"){
+            $customer_detail->save();
+            // $remark = "$point point added by $existing_reseller->name to $request->user_name";
+            // $result = $this->pointHistoryController->addPoints($request->rid, $customer_detail->id, $point, $remark,$platform);
+    
+            // return response()->json([
+            //     'status' => true,
+            //     'message' => 'Point added Successfully'
+            // ]);
+        }else{
+            $addpoint=$request->points;
+            if($platform =="ios"){
+                // dump('ios');
+                $existing_reseller_point=$existing_reseller->ios_point;
+                if($addpoint > $existing_reseller_point){
+                    return response()->json(["message"=>"you do not have enough point to add"]);
+                }else{
+                    $existing_reseller->ios_point -= $addpoint;
+                    $existing_reseller->save();
+                }
 
-        $resellerUser = User::where('id', $rid)->first();
-        $resellerUser->end_date = $resellerEndDate;
-        $resellerUser->save();
-
-
-        $remark = "$point point added by $resellerUser->name to $user->name";
-        $result = $this->pointHistoryController->addPoints($resellerUser->id, $user->id, $request->points, $remark,$point_type);
-        $user->point_reverse = $result->id;
-        $user->plan_expiry_date = $userEndDate;
-        $user->save();
+            }else{
+                // dump('android');
+                $existing_reseller_point=$existing_reseller->android_point;
+                if($addpoint > $existing_reseller_point){
+                    return response()->json(["message"=>"you do not have enough point to add"]);
+                }else{
+                    // dump( $existing_reseller->android_point);
+                    $existing_reseller->android_point -= $addpoint;
+                    $existing_reseller->save();
+                    // dump( $existing_reseller->android_point);
+                }
+            }
+            
+        }
+        
+        
+        $remark = "$point point added by $existing_reseller->name to $customer_detail->name";
+        $result = $this->pointHistoryController->addPoints($existing_reseller->id, $customer_detail->id, $request->points, $remark, $platform);
+        $customer_detail->point_reverse = $result->id;
+        $customer_detail->save();
         if ($result) {
             return response()->json([
                 'status' => true,
@@ -156,7 +329,7 @@ class CustomerController extends Controller
         $point = $request->points;
         $resellerEndDate = $request->reseller_end_date;
         $userEndDate = $request->user_end_date;
-        $point_type = $request->point_type??"ios";
+        $point_type = $request->point_type ?? "ios";
 
 
         $user = Customer::where('appId', $id)->first();
@@ -167,7 +340,7 @@ class CustomerController extends Controller
 
 
         $remark = "$point point added by $resellerUser->name to $user->name";
-        $result = $this->pointHistoryController->addPoints($resellerUser->id, $user->id, $request->points, $remark,$point_type);
+        $result = $this->pointHistoryController->addPoints($resellerUser->id, $user->id, $request->points, $remark, $point_type);
         $user->point_reverse = $result->id;
         $user->plan_expiry_date = $userEndDate;
         $user->save();
@@ -194,7 +367,7 @@ class CustomerController extends Controller
         $result = $this->paymentController->addPaymentStatus($cid, $rid, $status, $remarks);
 
         $update = Customer::where('id', $cid)->update([
-            'pstatus' => $cid??0
+            'pstatus' => $cid
         ]);
 
         if ($update) {
@@ -263,20 +436,20 @@ class CustomerController extends Controller
     {
         $name = $request->username;
         $password = $request->password;
-        $platform = $request->platform??"ios";
-        
-        if($platform == "ios" || $platform == "mac"){
+        $platform = $request->platform ?? "ios";
+
+        if ($platform == "ios" || $platform == "mac") {
             // dump('if');
             $user = Customer::where('username', $name)->first();
             // dump($user);
             if ($user->password == $password) {
-                
-                $customerpoint=PointHistory::select('id','customer_id','reseller_id','ios_point','android_point')
-                ->where('customer_id',$user->id)
-                ->where('reseller_id',$user->reseller_id)
-                ->first();
+
+                $customerpoint = PointHistory::select('id', 'customer_id', 'reseller_id', 'ios_point', 'android_point')
+                    ->where('customer_id', $user->id)
+                    ->where('reseller_id', $user->reseller_id)
+                    ->first();
                 // dd($customerpoint);
-                if(isset($customerpoint->ios_point) && $customerpoint->ios_point > 0){
+                if (isset($customerpoint->ios_point) && $customerpoint->ios_point > 0) {
                     //customer type 2-> paid 3-> demo 
                     if ($user->customer_type == 2 || $user->customer_type == 3) {
                         $meeting = Meeting::all();
@@ -321,10 +494,10 @@ class CustomerController extends Controller
                             'message' => 'Login  failed',
                         ], 400);
                     }
-                }else{
+                } else {
                     return response()->json([
-                        'success'=>true,
-                        'message'=>"do not have enough point to login"
+                        'success' => true,
+                        'message' => "do not have enough point to login"
                     ]);
                 }
             } else {
@@ -333,18 +506,18 @@ class CustomerController extends Controller
                     'message' => 'Login  fail!',
                 ], 400);
             }
-        }else{
+        } else {
             // dump('else');
             $user = Customer::where('username', $name)->first();
             // dump($user);
             if ($user->password == $password) {
-                
-                $customerpoint=PointHistory::select('id','customer_id','reseller_id','android_point','ios_point')
-                ->where('customer_id',$user->id)
-                ->where('reseller_id',$user->reseller_id)
-                ->first();
+
+                $customerpoint = PointHistory::select('id', 'customer_id', 'reseller_id', 'android_point', 'ios_point')
+                    ->where('customer_id', $user->id)
+                    ->where('reseller_id', $user->reseller_id)
+                    ->first();
                 // dd($customerpoint);
-                if((isset($customerpoint->ios_point) && $customerpoint->ios_point > 0) || (isset($customerpoint->android_point) && $customerpoint->android_point > 0)){
+                if ((isset($customerpoint->ios_point) && $customerpoint->ios_point > 0) || (isset($customerpoint->android_point) && $customerpoint->android_point > 0)) {
                     //customer type 2-> paid 3-> demo 
                     if ($user->customer_type == 2 || $user->customer_type == 3) {
                         $meeting = Meeting::all();
@@ -389,10 +562,10 @@ class CustomerController extends Controller
                             'message' => 'Login  failed',
                         ], 400);
                     }
-                }else{
+                } else {
                     return response()->json([
-                        'success'=>true,
-                        'message'=>"do not have enough point to login"
+                        'success' => true,
+                        'message' => "do not have enough point to login"
                     ]);
                 }
             } else {
@@ -407,8 +580,8 @@ class CustomerController extends Controller
     {
         $name = $request->username;
         $password = $request->password;
-        $platform = $request->platform??"ios";
-        
+        $platform = $request->platform ?? "ios";
+
         $user = Customer::where('username', $name)->first();
         if ($user->password == $password) {
             //customer type 2-> paid 3-> demo 
