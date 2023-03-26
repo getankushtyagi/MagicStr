@@ -12,6 +12,7 @@ use App\Models\PointHistory;
 use App\Models\User;
 use App\Models\Payment;
 use Exception;
+use Illuminate\Support\Facades\Crypt;
 
 class CustomerController extends Controller
 {
@@ -43,7 +44,8 @@ class CustomerController extends Controller
             $data->customer_type = $request->customer_type;
             $data->username = $request->username;
             // $data->password = $request->password;
-            $data->password = Hash::make($request->password);
+            // $data->password = Hash::make($request->password);
+            $data->password = Crypt::encrypt($request->password);
             $data->reseller_id = $request->reseller_id;
             $platform = $request->platform;
 
@@ -207,119 +209,121 @@ class CustomerController extends Controller
 
     public function addCustomerPoints(Request $request)
     {
-        $id = $request->appId;
-        $rid = $request->rid;
-        $point = $request->points;
-        $platform = $request->platform ?? "ios";
+        try {
+            $id = $request->appId;
+            $rid = $request->rid;
+            $point = $request->points;
+            $platform = $request->platform;
+            $customer_detail = Customer::where('appId', $id)->first();
+            // dd($customer_detail);
+            if ($platform == "ios") {
+                $existingexpirydateios = $customer_detail->ios_point_expiry;
+                if ($existingexpirydateios == null) {
+                    // dump('if');
+                    $currentdate = Date('Y-m-d h:i:s');
+                    $daysexpire = $request->points * 30;
+                    $expiredate = strtotime($currentdate . '+ ' . $daysexpire . ' days');
+                    $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
+                    $customer_detail->ios_point_expiry = $expiredateformat;
+                } else {
+                    // dump('else');
+                    $currentdate = $existingexpirydateios;
+                    $daysexpire = $request->points * 30;
+                    $expiredate = strtotime($currentdate . '+ ' . $daysexpire . ' days');
+                    $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
+                    $customer_detail->ios_point_expiry = $expiredateformat;
+                }
 
-        $customer_detail = Customer::where('appId', $id)->first();
-        // dd($customer_detail);
-        if ($platform == "ios") {
-            $existingexpirydateios = $customer_detail->ios_point_expiry;
-            if ($existingexpirydateios == null) {
-                // dump('if');
-                $currentdate = Date('Y-m-d h:i:s');
-                $daysexpire = $request->points * 30;
-                $expiredate = strtotime($currentdate . '+ ' . $daysexpire . ' days');
-                $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
-                $customer_detail->ios_point_expiry = $expiredateformat;
+                //update android also
+                $existingexpirydateandroid = $customer_detail->android_point_expiry;
+                if ($existingexpirydateandroid == null) {
+                    // dump('android if');
+                    $currentdate = Date('Y-m-d h:i:s');
+                    $daysexpire = $request->points * 30;
+                    $expiredate = strtotime($currentdate . '+ ' . $daysexpire . ' days');
+                    $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
+                    $customer_detail->android_point_expiry = $expiredateformat;
+                } else {
+                    // dump('android else');
+                    $currentdate = $existingexpirydateandroid;
+                    $daysexpire = $request->points * 30;
+                    $expiredate = strtotime($currentdate . '+ ' . $daysexpire . ' days');
+                    $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
+                    $customer_detail->android_point_expiry = $expiredateformat;
+                }
             } else {
-                // dump('else');
-                $currentdate = $existingexpirydateios;
-                $daysexpire = $request->points * 30;
-                $expiredate = strtotime($currentdate . '+ ' . $daysexpire . ' days');
-                $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
-                $customer_detail->ios_point_expiry = $expiredateformat;
+
+                $existingexpirydate = $customer_detail->android_point_expiry;
+                if ($existingexpirydate == null) {
+                    $currentdate = Date('Y-m-d h:i:s');
+                    $daysexpire = $request->points * 30;
+                    $expiredate = strtotime($currentdate . '+ ' . $daysexpire . ' days');
+                    $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
+                    $customer_detail->android_point_expiry = $expiredateformat;
+                } else {
+                    $currentdate = $existingexpirydate;
+                    $daysexpire = $request->points * 30;
+                    $expiredate = strtotime($currentdate . '+ ' . $daysexpire . ' days');
+                    $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
+                    $customer_detail->android_point_expiry = $expiredateformat;
+                }
             }
 
-            //update android also
-            $existingexpirydateandroid = $customer_detail->android_point_expiry;
-            if ($existingexpirydateandroid == null) {
-                // dump('android if');
-                $currentdate = Date('Y-m-d h:i:s');
-                $daysexpire = $request->points * 30;
-                $expiredate = strtotime($currentdate . '+ ' . $daysexpire . ' days');
-                $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
-                $customer_detail->android_point_expiry = $expiredateformat;
+
+            $existing_reseller = User::where('id', $rid)->first();
+            // dd($existing_reseller);
+            if ($existing_reseller->role_id == "0") {
+                $customer_detail->save();
+                // $remark = "$point point added by $existing_reseller->name to $request->user_name";
+                // $result = $this->pointHistoryController->addPoints($request->rid, $customer_detail->id, $point, $remark,$platform);
+
+                // return response()->json([
+                //     'status' => true,
+                //     'message' => 'Point added Successfully'
+                // ]);
             } else {
-                // dump('android else');
-                $currentdate = $existingexpirydateandroid;
-                $daysexpire = $request->points * 30;
-                $expiredate = strtotime($currentdate . '+ ' . $daysexpire . ' days');
-                $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
-                $customer_detail->android_point_expiry = $expiredateformat;
+                $addpoint = $request->points;
+                if ($platform == "ios") {
+                    // dump('ios');
+                    $existing_reseller_point = $existing_reseller->ios_point;
+                    if ($addpoint > $existing_reseller_point) {
+                        return response()->json(["message" => "you do not have enough point to add"]);
+                    } else {
+                        $existing_reseller->ios_point -= $addpoint;
+                        $existing_reseller->save();
+                    }
+                } else {
+                    // dump('android');
+                    $existing_reseller_point = $existing_reseller->android_point;
+                    if ($addpoint > $existing_reseller_point) {
+                        return response()->json(["message" => "you do not have enough point to add"]);
+                    } else {
+                        // dump( $existing_reseller->android_point);
+                        $existing_reseller->android_point -= $addpoint;
+                        $existing_reseller->save();
+                        // dump( $existing_reseller->android_point);
+                    }
+                }
             }
-        } else {
-            $existingexpirydate = $customer_detail->android_point_expiry;
-            if ($existingexpirydate == null) {
-                $currentdate = Date('Y-m-d h:i:s');
-                $daysexpire = $request->points * 30;
-                $expiredate = strtotime($currentdate . '+ ' . $daysexpire . ' days');
-                $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
-                $customer_detail->ios_point_expiry = $expiredateformat;
-            } else {
-                $currentdate = $existingexpirydate;
-                $daysexpire = $request->points * 30;
-                $expiredate = strtotime($currentdate . '+ ' . $daysexpire . ' days');
-                $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
-                $customer_detail->ios_point_expiry = $expiredateformat;
-            }
-        }
 
 
-        $existing_reseller = User::where('id', $rid)->first();
-        // dd($existing_reseller);
-        if($existing_reseller->role_id == "0"){
+            $remark = "$point point added by $existing_reseller->name to $customer_detail->name";
+            $result = $this->pointHistoryController->addPoints($existing_reseller->id, $customer_detail->id, $request->points, $remark, $platform);
+            $customer_detail->point_reverse = $result->id;
             $customer_detail->save();
-            // $remark = "$point point added by $existing_reseller->name to $request->user_name";
-            // $result = $this->pointHistoryController->addPoints($request->rid, $customer_detail->id, $point, $remark,$platform);
-    
-            // return response()->json([
-            //     'status' => true,
-            //     'message' => 'Point added Successfully'
-            // ]);
-        }else{
-            $addpoint=$request->points;
-            if($platform =="ios"){
-                // dump('ios');
-                $existing_reseller_point=$existing_reseller->ios_point;
-                if($addpoint > $existing_reseller_point){
-                    return response()->json(["message"=>"you do not have enough point to add"]);
-                }else{
-                    $existing_reseller->ios_point -= $addpoint;
-                    $existing_reseller->save();
-                }
-
-            }else{
-                // dump('android');
-                $existing_reseller_point=$existing_reseller->android_point;
-                if($addpoint > $existing_reseller_point){
-                    return response()->json(["message"=>"you do not have enough point to add"]);
-                }else{
-                    // dump( $existing_reseller->android_point);
-                    $existing_reseller->android_point -= $addpoint;
-                    $existing_reseller->save();
-                    // dump( $existing_reseller->android_point);
-                }
+            if ($result) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Pointed Added Successfully'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Request failed'
+                ]);
             }
-            
-        }
-        
-        
-        $remark = "$point point added by $existing_reseller->name to $customer_detail->name";
-        $result = $this->pointHistoryController->addPoints($existing_reseller->id, $customer_detail->id, $request->points, $remark, $platform);
-        $customer_detail->point_reverse = $result->id;
-        $customer_detail->save();
-        if ($result) {
-            return response()->json([
-                'status' => true,
-                'message' => 'Pointed Added Successfully'
-            ]);
-        } else {
-            return response()->json([
-                'status' => false,
-                'message' => 'Request failed'
-            ]);
+        } catch (\Exception $th) {
+            dd($th);
         }
     }
     public function addCustomerPoints_bk(Request $request)

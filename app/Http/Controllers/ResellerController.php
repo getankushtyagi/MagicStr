@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Reseller; 
+use App\Models\Reseller;
+use Illuminate\Support\Facades\Crypt;
 
 class ResellerController extends Controller
 {
@@ -73,7 +74,9 @@ class ResellerController extends Controller
             'name'=>$request->name,
             'email'=>$request->email,
             'mobile'=>$request->mobile,
-            'points'=>$request->points,
+            //remove point
+                // 'points'=>$request->points,
+            'password'=>Crypt::encrypt($request->password),  
             'image'=>isset($img) ? $img : $request->reseller_image,
         ]); 
         if($update){

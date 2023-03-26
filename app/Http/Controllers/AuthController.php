@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Customer;
 use Exception;
+use Illuminate\Support\Facades\Crypt;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -158,7 +159,7 @@ class AuthController extends Controller
         $id = $request->appId;
         $update = User::where('appId', $id)->update([
             'user_name' => $request->user_name,
-            'password' => Hash::make($request->password),
+            'password' => Crypt::encrypt($request->password),
         ]);
         if ($update) {
             $data = User::where('appId', $id)->first();
@@ -320,8 +321,9 @@ class AuthController extends Controller
         $user->appId = 'app_' . uniqid();
         $user->name = $request->name ?? "";
         $user->user_name = $request->user_name;
-        $user->password = Hash::make($request->password);
-
+        // $user->password = Hash::make($request->password);
+        $user->password = Crypt::encrypt($request->password);
+        // dump(Crypt::decrypt($request->password));
         //remove temp_pass
             // $user->temp_pass = $request->password;
         //remove login_status
