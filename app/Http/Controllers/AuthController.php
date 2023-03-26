@@ -179,6 +179,7 @@ class AuthController extends Controller
             'user_name' => $request->user_name,
             'mobile' => $request->mobile,
             'image_index' => $request->image_index,
+            'password' => Crypt::encrypt($request->password),
         ]);
         if ($update) {
             $data = User::where('appId', $id)->first();
