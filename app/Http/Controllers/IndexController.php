@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Customer; 
 use App\Models\Reseller; 
 use App\Models\Meeting;
+use Exception;
 use Illuminate\Support\Facades\Crypt;
 
 class IndexController extends Controller
@@ -36,7 +37,7 @@ class IndexController extends Controller
                 $cus_arr[$key]['reseller_id'] = $val['reseller_id'];
                 $cus_arr[$key]['name'] = $val['name'];
                 $cus_arr[$key]['username'] = $val['username'];
-                $cus_arr[$key]['password'] = Crypt::decrypt($val['password'])??$val['password'];
+                $cus_arr[$key]['password'] = Crypt::decrypt($val['temp_pass'])??$val['password'];
                 $cus_arr[$key]['point_reverse'] = $val['point_reverse'];
                 $cus_arr[$key]['pstatus'] = $val['pstatus'];
                 $cus_arr[$key]['created_at'] = $val['created_at'];
@@ -58,7 +59,7 @@ class IndexController extends Controller
                 $reseller_arr[$key]['mobile'] = $val['mobile'];
                 $reseller_arr[$key]['customer'] = $val['customer'];
                 $reseller_arr[$key]['image_index'] = $val['image_index'];
-                $reseller_arr[$key]['password'] = Crypt::decrypt($val['password'])??$val['password'];
+                $reseller_arr[$key]['password'] = Crypt::decrypt($val['temp_pass'])??$val['password'];
                 $reseller_arr[$key]['created_at'] = $val['created_at'];
                 $reseller_arr[$key]['updated_at'] = $val['updated_at'];
                 $reseller_arr[$key]['ios_point'] = $val['ios_point'];
@@ -123,63 +124,66 @@ class IndexController extends Controller
             ]);
         }
     }    
-    public function getAllUser(Request $request){
-         $request->validate([
-            'appId' => 'required|string',
-        ]);
-        $user = User::where('appId',$request->appId)->first(); 
-        if($user->reseller_id==0){
-        $allUser = User::all(); 
-
-        $reseller_arr=[];
-        foreach($allUser as $key=>$val){
-          $reseller_arr[$key]['id'] = $val['id'];
-          $reseller_arr[$key]['appId'] = $val['appId'];
-          $reseller_arr[$key]['name'] = $val['name'];
-          $reseller_arr[$key]['role_id'] = $val['role_id'];
-          $reseller_arr[$key]['reseller_id'] = $val['reseller_id'];
-          $reseller_arr[$key]['user_name'] = $val['user_name'];
-          $reseller_arr[$key]['mobile'] = $val['mobile'];
-          $reseller_arr[$key]['customer'] = $val['customer'];
-          $reseller_arr[$key]['image_index'] = $val['image_index'];
-          $reseller_arr[$key]['password'] = Crypt::decrypt($val['password'])??$val['password'];
-          $reseller_arr[$key]['created_at'] = $val['created_at'];
-          $reseller_arr[$key]['updated_at'] = $val['updated_at'];
-          $reseller_arr[$key]['ios_point'] = $val['ios_point'];
-          $reseller_arr[$key]['android_point'] = $val['android_point'];
+    public function getAllUser(Request $request)
+    {
+        try {
+            $request->validate([
+                'appId' => 'required|string',
+            ]);
+            $user = User::where('appId', $request->appId)->first();
+            // dd($user);
+            if ($user->role_id == 0) {
+                $allUser = User::all();
+                $reseller_arr = [];
+                foreach ($allUser as $key => $val) {
+                    $reseller_arr[$key]['id'] = $val['id'];
+                    $reseller_arr[$key]['appId'] = $val['appId'];
+                    $reseller_arr[$key]['name'] = $val['name'];
+                    $reseller_arr[$key]['role_id'] = $val['role_id'];
+                    $reseller_arr[$key]['reseller_id'] = $val['reseller_id'];
+                    $reseller_arr[$key]['user_name'] = $val['user_name'];
+                    $reseller_arr[$key]['mobile'] = $val['mobile'];
+                    $reseller_arr[$key]['customer'] = $val['customer'];
+                    $reseller_arr[$key]['image_index'] = $val['image_index'];
+                    $reseller_arr[$key]['password'] = Crypt::decrypt($val['temp_pass']);
+                    $reseller_arr[$key]['created_at'] = $val['created_at'];
+                    $reseller_arr[$key]['updated_at'] = $val['updated_at'];
+                    $reseller_arr[$key]['ios_point'] = $val['ios_point'];
+                    $reseller_arr[$key]['android_point'] = $val['android_point'];
+                }
+                return response()->json([
+                    'status' => true,
+                    'user' => $reseller_arr,
+                    'message' => 'All User List'
+                ]);
+            } else {
+                $allUser = User::where('reseller_id', $user->id)->get();
+                $reseller_arr = [];
+                foreach ($allUser as $key => $val) {
+                    $reseller_arr[$key]['id'] = $val['id'];
+                    $reseller_arr[$key]['appId'] = $val['appId'];
+                    $reseller_arr[$key]['name'] = $val['name'];
+                    $reseller_arr[$key]['role_id'] = $val['role_id'];
+                    $reseller_arr[$key]['reseller_id'] = $val['reseller_id'];
+                    $reseller_arr[$key]['user_name'] = $val['user_name'];
+                    $reseller_arr[$key]['mobile'] = $val['mobile'];
+                    $reseller_arr[$key]['customer'] = $val['customer'];
+                    $reseller_arr[$key]['image_index'] = $val['image_index'];
+                    $reseller_arr[$key]['password'] = Crypt::decrypt($val['temp_pass']) ?? $val['temp_pass'];
+                    $reseller_arr[$key]['created_at'] = $val['created_at'];
+                    $reseller_arr[$key]['updated_at'] = $val['updated_at'];
+                    $reseller_arr[$key]['ios_point'] = $val['ios_point'];
+                    $reseller_arr[$key]['android_point'] = $val['android_point'];
+                }
+                return response()->json([
+                    'status' => true,
+                    'user' => $allUser,
+                    'message' => 'All User List'
+                ]);
+            }
+        } catch (Exception $th) {
+            dd($th);
         }
-       return response()->json([
-                'status' => true,
-                'user'=>$reseller_arr,
-                'message'=>'All User List'
-            ]); 
-        }
-        else{
-        $allUser = User::where('reseller_id',$user->id)->get(); 
-        $reseller_arr=[];
-        foreach($allUser as $key=>$val){
-          $reseller_arr[$key]['id'] = $val['id'];
-          $reseller_arr[$key]['appId'] = $val['appId'];
-          $reseller_arr[$key]['name'] = $val['name'];
-          $reseller_arr[$key]['role_id'] = $val['role_id'];
-          $reseller_arr[$key]['reseller_id'] = $val['reseller_id'];
-          $reseller_arr[$key]['user_name'] = $val['user_name'];
-          $reseller_arr[$key]['mobile'] = $val['mobile'];
-          $reseller_arr[$key]['customer'] = $val['customer'];
-          $reseller_arr[$key]['image_index'] = $val['image_index'];
-          $reseller_arr[$key]['password'] = Crypt::decrypt($val['password'])??$val['password'];
-          $reseller_arr[$key]['created_at'] = $val['created_at'];
-          $reseller_arr[$key]['updated_at'] = $val['updated_at'];
-          $reseller_arr[$key]['ios_point'] = $val['ios_point'];
-          $reseller_arr[$key]['android_point'] = $val['android_point'];
-        }
-        return response()->json([
-                'status' => true,
-                'user'=>$allUser,
-                'message'=>'All User List'
-            ]);    
-        }
-       
     }
     
 }
