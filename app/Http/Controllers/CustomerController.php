@@ -691,10 +691,25 @@ class CustomerController extends Controller
     {
 
         $customers = Customer::all();
-
+        $cus_arr=[];
+        foreach ($customers as $key => $val) {
+            $cus_arr[$key]['id'] = $val['id'];
+            $cus_arr[$key]['appId'] = $val['appId'];
+            $cus_arr[$key]['customer_type'] = $val['customer_type'];
+            $cus_arr[$key]['reseller_id'] = $val['reseller_id'];
+            $cus_arr[$key]['name'] = $val['name'];
+            $cus_arr[$key]['username'] = $val['username'];
+            $cus_arr[$key]['password'] = Crypt::decrypt($val['temp_pass']) ?? $val['password'];
+            $cus_arr[$key]['point_reverse'] = $val['point_reverse'];
+            $cus_arr[$key]['pstatus'] = $val['pstatus'];
+            $cus_arr[$key]['created_at'] = $val['created_at'];
+            $cus_arr[$key]['updated_at'] = $val['updated_at'];
+            $cus_arr[$key]['ios_point_expiry'] = $val['ios_point_expiry'];
+            $cus_arr[$key]['android_point_expiry'] = $val['android_point_expiry'];
+        }
         return response()->json([
             'status' => true,
-            'data' => $customers,
+            'data' => $cus_arr,
             'message' => 'All Customers'
         ]);
     }
@@ -719,20 +734,51 @@ class CustomerController extends Controller
 
     public function updateCustomer(Request $request)
     {
-        $id = $request->id;
-        $update = Customer::where('id', $id)->update([
-            'name' => $request->name,
-            'username' => $request->username,
-            'customer_type' => $request->customer_type,
-            'plan_expiry_date' => $request->plan_expiry_date
-        ]);
+        try {
+            $id = $request->appId;
+            $platform = $request->platform;
+            if($platform=="ios"){
 
-        if ($update) {
-            return response()->json([
-                'status' => true,
-                'message' => 'Customer Updated Successfully'
-            ]);
+                $update = Customer::where('appId', $id)->update([
+                    'name' => $request->name,
+                    'username' => $request->username,
+                    'customer_type' => $request->customer_type??2,
+                    'password' => Hash::make($request->password),
+                    'temp_pass' => Crypt::encrypt($request->password),
+                    'updated_at' => Carbon::now()->toDateTime()??"00:00:00",
+                    'pstatus'=>$request->pstatus,
+                    'ios_point_expiry'=>$request->expiry_date
+                ]);
+            }else{
+
+                $update = Customer::where('appId', $id)->update([
+                    'name' => $request->name,
+                    'username' => $request->username,
+                    'customer_type' => $request->customer_type??2,
+                    'password' => Hash::make($request->password),
+                    'temp_pass' => Crypt::encrypt($request->password),
+                    'updated_at' => Carbon::now()->toDateTime()??"00:00:00",
+                    'pstatus'=>$request->pstatus,
+                    'android_point_expiry'=>$request->expiry_date,
+                ]);
+            }
+
+            
+            if ($update) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Customer Updated Successfully'
+                ]);
+            }else{
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Something went wrong!!'
+                ]);
+            }
+        } catch (Exception $e) {
+            dd($e);
         }
+        
     }
 
     public function changePassword(Request $request)
