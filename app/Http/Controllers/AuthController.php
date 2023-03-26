@@ -21,36 +21,43 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
-            'user_name' => 'required|string',
-            'password' => 'required|string',
-        ]);
-        $credentials = $request->only('user_name', 'password');
-
-
-        $token = Auth::attempt($credentials);
-        if (!$token) {
+        try {
+            //code...
+            $request->validate([
+                'user_name' => 'required|string',
+                'password' => 'required|string',
+            ]);
+            $credentials = $request->only('user_name', 'password');
+            
+            
+            $token = Auth::attempt($credentials);
+            // dd('chck',$token);
+            if (!$token) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'token not found',
+                ], 401);
+            }
+            $user = Auth::user();
+            // $update = User::where('appId', $user->appId)->update([
+            //     'login_status' => '1'
+            // ]);
+            $data = Customer::where('reseller_id', $user->id)->get();
             return response()->json([
-                'status' => false,
-                'message' => 'token not found',
-            ], 401);
+                'status' => true,
+                'user' => $user,
+                'customer' => $data,
+                'policy' => 'https://www.nxtlevel.live/privacy-policy',
+                'message' => 'Login Successfully',
+                'authorisation' => [
+                    'token' => $token,
+                    'type' => 'bearer',
+                ]
+            ]);
+        } catch (Exception $th) {
+            dd($th);
         }
-        $user = Auth::user();
-        $update = User::where('appId', $user->appId)->update([
-            'login_status' => '1'
-        ]);
-        $data = Customer::where('reseller_id', $user->id)->get();
-        return response()->json([
-            'status' => true,
-            'user' => $user,
-            'customer' => $data,
-            'policy' => 'https://www.nxtlevel.live/privacy-policy',
-            'message' => 'Login Successfully',
-            'authorisation' => [
-                'token' => $token,
-                'type' => 'bearer',
-            ]
-        ]);
+        
     }
     
     public function login_bk(Request $request)
