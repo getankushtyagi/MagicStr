@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Customer;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Crypt;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -177,21 +178,34 @@ class AuthController extends Controller
 
     public function updateUser(Request $request)
     {
-        $id = $request->appId;
-        $update = User::where('appId', $id)->update([
-            'name' => $request->name,
-            'user_name' => $request->user_name,
-            'mobile' => $request->mobile,
-            'image_index' => $request->image_index,
-            'password' => Crypt::encrypt($request->password),
-        ]);
-        if ($update) {
-            $data = User::where('appId', $id)->first();
-            return response()->json([
-                'status' => true,
-                'data' => $data,
-                'message' => 'User Updated Successfully'
+        try {
+            $id = $request->appId;
+            $update = User::where('appId', $id)->update([
+                'name' => $request->name??"",
+                'user_name' => $request->user_name??"",
+                'mobile' => $request->mobile??"",
+                'image_index' => $request->image_index??0,
+                'password' => Hash::make($request->password)??"",
+                'temp_pass' => Crypt::encrypt($request->password)??"",
+                'name' => $request->name??"",
+                'updated_at' => Carbon::now()->toDateTime()??"00:00:00"
             ]);
+            // dd($update);
+            if ($update) {
+                $data = User::where('appId', $id)->first();
+                return response()->json([
+                    'status' => true,
+                    'data' => $data,
+                    'message' => 'User Updated Successfully'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'something went wrong'
+                ]);
+            }
+        } catch (Exception $e) {
+            dd($e);
         }
     }
 
@@ -315,7 +329,7 @@ class AuthController extends Controller
                         ]);
                     }else{
                         $user->ios_point -= $point;
-                        $resellerUser += $point;
+                        $resellerUser->ios_point += $point;
                         $user->save();
                         $resellerUser->save();
                     }
@@ -348,7 +362,7 @@ class AuthController extends Controller
                         ]);
                     }else{
                         $user->android_point -= $point;
-                        $resellerUser += $point;
+                        $resellerUser->android_point += $point;
                         $user->save();
                         $resellerUser->save();
                     }

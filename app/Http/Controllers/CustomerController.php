@@ -393,21 +393,69 @@ class CustomerController extends Controller
         $id = $request->appId;
         $rid = $request->rid;
         $point = $request->points;
-        $resellerEndDate = $request->reseller_end_date;
-        $userEndDate = $request->user_end_date;
+        $platform = $request->platform;
 
-        $user = Customer::where('appId', $id)->first();
+        $customer = Customer::where('appId', $id)->first();
 
         $resellerUser = User::where('id', $rid)->first();
-        $resellerUser->end_date = $resellerEndDate;
-        $resellerUser->save();
 
-        $remark = "$point point reversed by $resellerUser->name from $user->name";
-        $result = $this->pointHistoryController->addPoints($resellerUser->id, $user->id, $request->points, $remark);
+        if ($platform == "ios") {
+            if ($customer['ios_point_expiry'] == null) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'user do not have any point'
+                ]);
+            } else {
+                if ($resellerUser->role_id == 0) {
+                    $customerexpirydate = $customer->ios_point_expiry;
+                    $daysexpire = $point * 30;
+                    $expiredate = strtotime($customerexpirydate . '- ' . $daysexpire . ' days');
+                    $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
+                    $customer->ios_point_expiry = $expiredateformat;
+                    $customer->save();
+                } else {
 
-        $user->point_reverse = "0";
-        $user->plan_expiry_date = $userEndDate;
-        $user->save();
+                    $customerexpirydate = $customer->ios_point_expiry;
+                    $daysexpire = $point * 30;
+                    $expiredate = strtotime($customerexpirydate . '- ' . $daysexpire . ' days');
+                    $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
+                    $customer->ios_point_expiry = $expiredateformat;
+                    $resellerUser->ios_point += $point;
+                    $customer->save();
+                    $resellerUser->save();
+                }
+            }
+        } else {
+
+            if ($customer['android_point_expiry'] == null) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'user do not have any point'
+                ]);
+            } else {
+                if ($resellerUser->role_id == 0) {
+                    $customerexpirydate = $customer->android_point_expiry;
+                    $daysexpire = $point * 30;
+                    $expiredate = strtotime($customerexpirydate . '- ' . $daysexpire . ' days');
+                    $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
+                    $customer->android_point_expiry = $expiredateformat;
+                    $customer->save();
+                } else {
+
+                    $customerexpirydate = $customer->android_point_expiry;
+                    $daysexpire = $point * 30;
+                    $expiredate = strtotime($customerexpirydate . '- ' . $daysexpire . ' days');
+                    $expiredateformat = Date('Y-m-d h:i:s', $expiredate) ?? "";
+                    $customer->android_point_expiry = $expiredateformat;
+                    $resellerUser->android_point += $point;
+                    $customer->save();
+                    $resellerUser->save();
+                }
+            }
+        }
+        $remark = "$point point reversed by $resellerUser->name from $customer->name";
+        $result = $this->pointHistoryController->addPoints($resellerUser->id, $customer->id, $request->points, $remark, $platform);
+
         if ($result) {
             return response()->json([
                 'status' => true,
