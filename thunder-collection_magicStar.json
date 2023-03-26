@@ -1,0 +1,1086 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "magicStar",
+    "dateExported": "2023-03-26T12:58:18.547Z",
+    "version": "1.1",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "20aa4576-6b58-481f-9014-2b8554748881",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "reseller/register",
+            "url": "",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2023-03-14T03:59:56.735Z",
+            "modified": "2023-03-14T03:59:56.735Z",
+            "headers": [
+                {
+                    "name": "user_appId",
+                    "value": "app_63ac76b6f2165"
+                }
+            ],
+            "body": {
+                "form": [
+                    {
+                        "name": "name",
+                        "value": "sagar"
+                    },
+                    {
+                        "name": "user_name",
+                        "value": "admin14"
+                    },
+                    {
+                        "name": "password",
+                        "value": "admin14"
+                    },
+                    {
+                        "name": "role_id",
+                        "value": "1"
+                    },
+                    {
+                        "name": "image_index",
+                        "value": "1"
+                    },
+                    {
+                        "name": "reseller_id",
+                        "value": "69"
+                    },
+                    {
+                        "name": "start_date",
+                        "value": "2023-02-11T09:12:40.000000Z"
+                    },
+                    {
+                        "name": "end_date",
+                        "value": "2023-02-11T09:12:40.000000Z"
+                    },
+                    {
+                        "name": "reseller_end_date",
+                        "value": "2023-02-11T09:12:40.000000Z"
+                    },
+                    {
+                        "name": "points",
+                        "value": "2"
+                    }
+                ],
+                "files": [],
+                "type": "formdata"
+            }
+        },
+        {
+            "_id": "42ddf88e-5342-4d8a-9538-c7ae959bf6d1",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "reseller/login",
+            "url": "http://127.0.0.1:8000/api/reseller/login",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2023-03-14T03:59:56.737Z",
+            "modified": "2023-03-18T06:50:28.382Z",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNjc5MTIyMDM4LCJleHAiOjE2NzkxMjU2MzgsIm5iZiI6MTY3OTEyMjAzOCwianRpIjoiYmlydzdvSEtnaXgxeHUyUCIsInN1YiI6IjEwNyIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.hCQRjlCxTqYYzvqI-wiCO1apSrgMElpb_ot4WEPz2Bo"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formdata",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "user_name",
+                        "value": "admin3"
+                    },
+                    {
+                        "name": "password",
+                        "value": "admin3"
+                    }
+                ]
+            },
+            "tests": []
+        },
+        {
+            "_id": "456195a1-a665-4302-ac7b-de1e4eaab375",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "home",
+            "url": "",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2023-03-14T03:59:56.738Z",
+            "modified": "2023-03-14T03:59:56.738Z",
+            "headers": [],
+            "body": {
+                "form": [
+                    {
+                        "name": "appId",
+                        "value": "app_63e26c099ca4e"
+                    }
+                ],
+                "files": [],
+                "type": "formdata"
+            }
+        },
+        {
+            "_id": "2f981d57-2853-4556-a470-1220e99957be",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "point_history",
+            "url": "",
+            "method": "POST",
+            "sortNum": 140000,
+            "created": "2023-03-14T03:59:56.749Z",
+            "modified": "2023-03-14T03:59:56.749Z",
+            "headers": [
+                {
+                    "name": "user_appId",
+                    "value": "app_63ac76b6f2165"
+                }
+            ],
+            "body": {
+                "form": [
+                    {
+                        "name": "appId",
+                        "value": "app_63cd524a5a00d",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "email",
+                        "value": "sagar@yopmail.com",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "password",
+                        "value": "sagar@123",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "reseller_id",
+                        "value": "22",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "password_confirmation",
+                        "value": "",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "customer_id",
+                        "value": "52"
+                    }
+                ],
+                "files": [],
+                "type": "formdata"
+            }
+        },
+        {
+            "_id": "cd51a877-75ab-427c-951b-87b1fe72f0a4",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "customer/add",
+            "url": "http://127.0.0.1:8000/api/customer/add",
+            "method": "POST",
+            "sortNum": 160000,
+            "created": "2023-03-14T03:59:56.751Z",
+            "modified": "2023-03-26T11:03:21.958Z",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNjc5MTIyOTU4LCJleHAiOjE2NzkxMjY1NTgsIm5iZiI6MTY3OTEyMjk1OCwianRpIjoiVEl2Y3QydDNEa2h6dnlnWiIsInN1YiI6IjEwNyIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.HkuExb4EUIy46sHzMnNJCRK-Ob58jeJVXq7Ls6e_Usk"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formdata",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "name",
+                        "value": "ank"
+                    },
+                    {
+                        "name": "username",
+                        "value": "ankush"
+                    },
+                    {
+                        "name": "password",
+                        "value": "Test@12345"
+                    },
+                    {
+                        "name": "points",
+                        "value": "2"
+                    },
+                    {
+                        "name": "active_date",
+                        "value": "2023-03-18 12:30:29",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "plan_expiry_date",
+                        "value": "2022-12-28 22:50:29",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "customer_type",
+                        "value": "2"
+                    },
+                    {
+                        "name": "reseller_id",
+                        "value": "62"
+                    },
+                    {
+                        "name": "reseller_end_date",
+                        "value": "2024-02-28 09:22",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "reseller_points",
+                        "value": "417"
+                    },
+                    {
+                        "name": "pstatus",
+                        "value": "0"
+                    },
+                    {
+                        "name": "platform",
+                        "value": "android"
+                    }
+                ]
+            },
+            "tests": []
+        },
+        {
+            "_id": "8afbad2f-fa91-454b-a408-026cc0c7dcff",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "customer/register",
+            "url": "",
+            "method": "POST",
+            "sortNum": 170000,
+            "created": "2023-03-14T03:59:56.752Z",
+            "modified": "2023-03-14T03:59:56.752Z",
+            "headers": [],
+            "body": {
+                "form": [
+                    {
+                        "name": "name",
+                        "value": "cuse13"
+                    },
+                    {
+                        "name": "username",
+                        "value": "cuse23"
+                    },
+                    {
+                        "name": "password",
+                        "value": "cuse1"
+                    },
+                    {
+                        "name": "points",
+                        "value": "1"
+                    },
+                    {
+                        "name": "active_date",
+                        "value": ""
+                    },
+                    {
+                        "name": "plan_expiry_date",
+                        "value": "2022-12-28 22:50:29"
+                    },
+                    {
+                        "name": "customer_type",
+                        "value": "1"
+                    },
+                    {
+                        "name": "reseller_id",
+                        "value": "62"
+                    },
+                    {
+                        "name": "reseller_end_date",
+                        "value": "2023-12-28 22:50:29"
+                    },
+                    {
+                        "name": "reseller_points",
+                        "value": "100",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "pstatus",
+                        "value": "0"
+                    }
+                ],
+                "files": [],
+                "type": "formdata"
+            }
+        },
+        {
+            "_id": "3ee3b5b4-34d5-49e8-86bc-de3980f832d7",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "customer/update",
+            "url": "",
+            "method": "POST",
+            "sortNum": 180000,
+            "created": "2023-03-14T03:59:56.753Z",
+            "modified": "2023-03-14T03:59:56.753Z",
+            "headers": [],
+            "body": {
+                "form": [
+                    {
+                        "name": "name",
+                        "value": "cuse13"
+                    },
+                    {
+                        "name": "username",
+                        "value": "cuse23"
+                    },
+                    {
+                        "name": "password",
+                        "value": "cuse1"
+                    },
+                    {
+                        "name": "points",
+                        "value": "1"
+                    },
+                    {
+                        "name": "active_date",
+                        "value": ""
+                    },
+                    {
+                        "name": "plan_expiry_date",
+                        "value": "2022-12-28 22:50:29"
+                    },
+                    {
+                        "name": "customer_type",
+                        "value": "1"
+                    },
+                    {
+                        "name": "reseller_id",
+                        "value": "62"
+                    },
+                    {
+                        "name": "reseller_end_date",
+                        "value": "2023-12-28 22:50:29"
+                    },
+                    {
+                        "name": "reseller_points",
+                        "value": "100",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "pstatus",
+                        "value": "0"
+                    }
+                ],
+                "files": [],
+                "type": "formdata"
+            }
+        },
+        {
+            "_id": "e726a2cc-d25d-4182-a18d-b2c08af806b6",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "customer/login",
+            "url": "http://127.0.0.1:8000/api/customer/login",
+            "method": "POST",
+            "sortNum": 190000,
+            "created": "2023-03-14T03:59:56.754Z",
+            "modified": "2023-03-26T11:07:12.880Z",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNjc5NzMwNzcwLCJleHAiOjE2Nzk3MzQzNzAsIm5iZiI6MTY3OTczMDc3MCwianRpIjoiREw0Q09vQ2FVWnhSNjVRUiIsInN1YiI6IjYyIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.fz9uuohPmCYjgju5PGkmW1-zhdRwuK0AplefZymff7g",
+                    "isDisabled": true
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formdata",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "ankush"
+                    },
+                    {
+                        "name": "password",
+                        "value": "Test@12345"
+                    },
+                    {
+                        "name": "platform",
+                        "value": "android"
+                    }
+                ]
+            },
+            "tests": []
+        },
+        {
+            "_id": "c242b5e9-d535-4353-8ea0-805c2ef7d68f",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "customer/add_points",
+            "url": "https://magicstream.in/MagicStr/api/customer/add_point",
+            "method": "POST",
+            "sortNum": 200000,
+            "created": "2023-03-14T03:59:56.755Z",
+            "modified": "2023-03-26T07:21:30.222Z",
+            "headers": [
+                {
+                    "name": "user_appId",
+                    "value": "app_63ac76b6f2165"
+                },
+                {
+                    "name": "Authorization",
+                    "value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNjc5NzMwNzcwLCJleHAiOjE2Nzk3MzQzNzAsIm5iZiI6MTY3OTczMDc3MCwianRpIjoiREw0Q09vQ2FVWnhSNjVRUiIsInN1YiI6IjYyIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.fz9uuohPmCYjgju5PGkmW1-zhdRwuK0AplefZymff7g"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formdata",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "appId",
+                        "value": "app_6400d0c5e8628"
+                    },
+                    {
+                        "name": "rid",
+                        "value": "62"
+                    },
+                    {
+                        "name": "points",
+                        "value": "1"
+                    },
+                    {
+                        "name": "reseller_end_date",
+                        "value": "2023-05-28 09:25:35",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "user_end_date",
+                        "value": "2023-05-28 09:25:35",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "platform",
+                        "value": "ios"
+                    }
+                ]
+            },
+            "tests": []
+        },
+        {
+            "_id": "14a0e2c0-893e-4056-b8b1-f9621770c121",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "customer/reverse_points",
+            "url": "http://127.0.0.1:8000/api/customer/reverse_points",
+            "method": "POST",
+            "sortNum": 210000,
+            "created": "2023-03-14T03:59:56.756Z",
+            "modified": "2023-03-26T12:45:55.484Z",
+            "headers": [
+                {
+                    "name": "user_appId",
+                    "value": "app_63ac76b6f2165"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formdata",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "appId",
+                        "value": "app_64202679cbba7"
+                    },
+                    {
+                        "name": "rid",
+                        "value": "149"
+                    },
+                    {
+                        "name": "points",
+                        "value": "1"
+                    },
+                    {
+                        "name": "platform",
+                        "value": "android"
+                    }
+                ]
+            },
+            "tests": []
+        },
+        {
+            "_id": "e75697ee-8edf-4ed7-8988-7ab54df39a65",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "customer/change_pass",
+            "url": "",
+            "method": "POST",
+            "sortNum": 220000,
+            "created": "2023-03-14T03:59:56.757Z",
+            "modified": "2023-03-14T03:59:56.757Z",
+            "headers": [],
+            "body": {
+                "form": [
+                    {
+                        "name": "name",
+                        "value": "magic1",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "username",
+                        "value": "magic10",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "password",
+                        "value": "magic10"
+                    },
+                    {
+                        "name": "points",
+                        "value": "1",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "active_date",
+                        "value": "2022-12-28 22:50:29",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "plan_expiry_date",
+                        "value": "2022-12-28 22:50:29",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "customer_type",
+                        "value": "2",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "reseller_id",
+                        "value": "22",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "id",
+                        "value": "78"
+                    },
+                    {
+                        "name": "reseller_points",
+                        "value": "1",
+                        "isDisabled": true
+                    }
+                ],
+                "files": [],
+                "type": "formdata"
+            }
+        },
+        {
+            "_id": "0e967335-a5d7-410f-a35d-4277a1532942",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "customer/all",
+            "url": "http://127.0.0.1:8000/api/customer/all",
+            "method": "GET",
+            "sortNum": 230000,
+            "created": "2023-03-14T03:59:56.758Z",
+            "modified": "2023-03-25T10:04:28.936Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "formdata",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "id",
+                        "value": "32"
+                    },
+                    {
+                        "name": "access",
+                        "value": "1"
+                    }
+                ]
+            },
+            "tests": []
+        },
+        {
+            "_id": "9093a0ba-a484-4be7-9aea-6ebba1f196d9",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "customer/delete",
+            "url": "",
+            "method": "GET",
+            "sortNum": 240000,
+            "created": "2023-03-14T03:59:56.759Z",
+            "modified": "2023-03-14T03:59:56.759Z",
+            "headers": [],
+            "body": {
+                "form": [
+                    {
+                        "name": "customer_id",
+                        "value": "1,2,3,4"
+                    }
+                ],
+                "files": [],
+                "type": "formdata"
+            }
+        },
+        {
+            "_id": "2cf41ea4-c5d8-40bb-8650-9c107b8811e4",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "meeting/add",
+            "url": "",
+            "method": "POST",
+            "sortNum": 250000,
+            "created": "2023-03-14T03:59:56.760Z",
+            "modified": "2023-03-14T03:59:56.760Z",
+            "headers": [],
+            "body": {
+                "form": [
+                    {
+                        "name": "name",
+                        "value": "FAST CRICKET\n\n"
+                    },
+                    {
+                        "name": "meeting_id",
+                        "value": "3355335504"
+                    },
+                    {
+                        "name": "passcode",
+                        "value": "8890"
+                    },
+                    {
+                        "name": "sdk_key",
+                        "value": "a9Jf4ZD3l5Sda8jzI19UPcS6X3vKqI3OVZA9"
+                    },
+                    {
+                        "name": "sdk_secret",
+                        "value": "uFLKUuobzILxYSFmaEzbqzMfkLCsjGZFEU7q"
+                    },
+                    {
+                        "name": "show",
+                        "value": "Enable"
+                    },
+                    {
+                        "name": "customer_name",
+                        "value": "5467,7609,6639,7010,2236,5234,4986,8799,7163,9419,2664,9855,5696,5180,4050,7692,9836,8508,9421,7948,7511,5081,6261,3305,3603,8230,9590,5608,3186,4671,5525,7376,6980,3829,5702,8214,9508,6684,4386,5563,7349,6918,5262,6047,8304,4214,9065,5175,2981,8343\n\n"
+                    },
+                    {
+                        "name": "id",
+                        "value": "6"
+                    },
+                    {
+                        "name": "pattern",
+                        "value": "Diamond"
+                    }
+                ],
+                "files": [],
+                "type": "formdata"
+            }
+        },
+        {
+            "_id": "4f106878-7ab6-4872-bf1a-2493709c23b0",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "meeting/edit",
+            "url": "",
+            "method": "POST",
+            "sortNum": 260000,
+            "created": "2023-03-14T03:59:56.761Z",
+            "modified": "2023-03-14T03:59:56.761Z",
+            "headers": [],
+            "body": {
+                "form": [
+                    {
+                        "name": "name",
+                        "value": "Ravi"
+                    },
+                    {
+                        "name": "meeting_id",
+                        "value": "1234"
+                    },
+                    {
+                        "name": "passcode",
+                        "value": "abc123"
+                    },
+                    {
+                        "name": "sdk_key",
+                        "value": "abc1234"
+                    },
+                    {
+                        "name": "sdk_secret",
+                        "value": "12345asdfghjhtr"
+                    },
+                    {
+                        "name": "show",
+                        "value": "enable"
+                    },
+                    {
+                        "name": "customer_name",
+                        "value": "Raj,Rahul,Rajat,Dev"
+                    },
+                    {
+                        "name": "id",
+                        "value": "6"
+                    }
+                ],
+                "files": [],
+                "type": "formdata"
+            }
+        },
+        {
+            "_id": "3dd8352c-f156-43e3-9643-7cfce3f900d2",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "meeting/delete",
+            "url": "",
+            "method": "GET",
+            "sortNum": 270000,
+            "created": "2023-03-14T03:59:56.762Z",
+            "modified": "2023-03-14T03:59:56.762Z",
+            "headers": []
+        },
+        {
+            "_id": "e187161f-35ad-4614-81d9-870857d4013f",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "meeting/all",
+            "url": "",
+            "method": "GET",
+            "sortNum": 280000,
+            "created": "2023-03-14T03:59:56.763Z",
+            "modified": "2023-03-14T03:59:56.763Z",
+            "headers": []
+        },
+        {
+            "_id": "d1fb416c-3ceb-4f58-b7ce-4127c2cdeb82",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "notification/all",
+            "url": "",
+            "method": "GET",
+            "sortNum": 290000,
+            "created": "2023-03-14T03:59:56.764Z",
+            "modified": "2023-03-14T03:59:56.764Z",
+            "headers": []
+        },
+        {
+            "_id": "84c275cd-e380-4ba5-b168-1b4b92462ee9",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "notification/add",
+            "url": "",
+            "method": "POST",
+            "sortNum": 300000,
+            "created": "2023-03-14T03:59:56.765Z",
+            "modified": "2023-03-14T03:59:56.765Z",
+            "headers": [],
+            "body": {
+                "form": [
+                    {
+                        "name": "type",
+                        "value": "0"
+                    },
+                    {
+                        "name": "msg",
+                        "value": "hi"
+                    },
+                    {
+                        "name": "from",
+                        "value": "2022-12-08 07:50:29"
+                    },
+                    {
+                        "name": "to",
+                        "value": "2022-12-28 22:50:29"
+                    }
+                ],
+                "files": [],
+                "type": "formdata"
+            }
+        },
+        {
+            "_id": "65510863-0220-4b76-8c09-92a9d69dbd56",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "notification/delete",
+            "url": "",
+            "method": "POST",
+            "sortNum": 310000,
+            "created": "2023-03-14T03:59:56.766Z",
+            "modified": "2023-03-14T03:59:56.766Z",
+            "headers": [],
+            "body": {
+                "form": [
+                    {
+                        "name": "customer_id",
+                        "value": "1,2,3,4"
+                    },
+                    {
+                        "name": "id",
+                        "value": "1"
+                    }
+                ],
+                "files": [],
+                "type": "formdata"
+            }
+        },
+        {
+            "_id": "bd8b64f7-74c6-4c57-99ff-c78c75c6deaa",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "customer/mylist",
+            "url": "http://127.0.0.1:8000/api/customer/mylist",
+            "method": "POST",
+            "sortNum": 350000,
+            "created": "2023-03-18T07:14:51.441Z",
+            "modified": "2023-03-18T07:14:51.441Z",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNjc5MTIyOTU4LCJleHAiOjE2NzkxMjY1NTgsIm5iZiI6MTY3OTEyMjk1OCwianRpIjoiVEl2Y3QydDNEa2h6dnlnWiIsInN1YiI6IjEwNyIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.HkuExb4EUIy46sHzMnNJCRK-Ob58jeJVXq7Ls6e_Usk"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"id\":107\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "2e066883-d254-4c12-8cd4-724839cec6f7",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "http://127.0.0.1:8000/api/add_point",
+            "url": "http://127.0.0.1:8000/api/add_point",
+            "method": "POST",
+            "sortNum": 360000,
+            "created": "2023-03-25T19:19:48.867Z",
+            "modified": "2023-03-26T12:57:18.357Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"appId\":\"app_64201970c9f3e\",\n  \"rid\":62,\n  \"points\":3,\n  \"name\":\"ankush\",\n  \"platform\":\"android\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "207b6562-cbf4-4232-9110-931b12c69d38",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "http://127.0.0.1:8000/api/updateUser",
+            "url": "http://127.0.0.1:8000/api/updateUser",
+            "method": "POST",
+            "sortNum": 410000,
+            "created": "2023-03-26T12:22:35.573Z",
+            "modified": "2023-03-26T12:22:35.573Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "formdata",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "appId",
+                        "value": "app_6420254ccd143"
+                    },
+                    {
+                        "name": "user_name",
+                        "value": "ankush"
+                    },
+                    {
+                        "name": "mobile",
+                        "value": "1234"
+                    },
+                    {
+                        "name": "image_index",
+                        "value": "0"
+                    },
+                    {
+                        "name": "password",
+                        "value": "Test@12345"
+                    },
+                    {
+                        "name": "name",
+                        "value": "ankush"
+                    }
+                ]
+            },
+            "tests": []
+        },
+        {
+            "_id": "290ab9f8-1f28-4b8f-8086-f7b31e02823f",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "reseller_point",
+            "url": "http://127.0.0.1:8000/api/reseller_point",
+            "method": "POST",
+            "sortNum": 420000,
+            "created": "2023-03-26T12:29:21.067Z",
+            "modified": "2023-03-26T12:29:21.067Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"appId\":\"app_6420254ccd143\",\n  \"rid\":62,\n  \"platform\":\"ios\",\n  \"points\":1\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "dd54879d-98da-4a84-b6b3-9d0c3c57c88a",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "updateUser",
+            "url": "http://127.0.0.1:8000/api/updateUser",
+            "method": "POST",
+            "sortNum": 430000,
+            "created": "2023-03-26T12:52:03.693Z",
+            "modified": "2023-03-26T12:52:03.693Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "formdata",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "appId",
+                        "value": "app_6420254ccd143"
+                    },
+                    {
+                        "name": "user_name",
+                        "value": "ankush"
+                    },
+                    {
+                        "name": "mobile",
+                        "value": "1234"
+                    },
+                    {
+                        "name": "image_index",
+                        "value": "0"
+                    },
+                    {
+                        "name": "password",
+                        "value": "Test@12345"
+                    },
+                    {
+                        "name": "name",
+                        "value": "ankush"
+                    }
+                ]
+            },
+            "tests": []
+        },
+        {
+            "_id": "9c8411f4-1288-4af2-8b69-2a465d3abd16",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "all-user",
+            "url": "http://127.0.0.1:8000/api/all-user",
+            "method": "POST",
+            "sortNum": 440000,
+            "created": "2023-03-26T12:52:32.080Z",
+            "modified": "2023-03-26T12:52:32.080Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"appId\":\"app_63e26c099ca4e\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "33f26876-341d-40e6-bb99-daa5748f1350",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "login",
+            "url": "http://127.0.0.1:8000/api/login",
+            "method": "POST",
+            "sortNum": 450000,
+            "created": "2023-03-26T12:52:58.295Z",
+            "modified": "2023-03-26T12:52:58.295Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"user_name\": \"ankush_reseller\",\n  \"password\": \"Test@12345\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "ecb24b2f-7da0-4a4d-8ffb-4d2437a09655",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "register",
+            "url": "http://127.0.0.1:8000/api/register",
+            "method": "POST",
+            "sortNum": 460000,
+            "created": "2023-03-26T12:53:32.439Z",
+            "modified": "2023-03-26T12:53:32.439Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"user_name\":\"ank\",\n  \"name\":\"ankush\",\n  \"password\":\"Test@12345\",\n  \"role_id\":2,\n  \"reseller_id\":62,\n  \"mobile\":123457,\n  \"points\":100,\n  \"platform\":\"ios\"\n  \n  \n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "351015df-cc49-46b7-9436-4b149172e1cc",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "mylist",
+            "url": "http://127.0.0.1:8000/api/customer/mylist",
+            "method": "POST",
+            "sortNum": 470000,
+            "created": "2023-03-26T12:53:47.078Z",
+            "modified": "2023-03-26T12:53:47.078Z",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNjc5MTIyOTU4LCJleHAiOjE2NzkxMjY1NTgsIm5iZiI6MTY3OTEyMjk1OCwianRpIjoiVEl2Y3QydDNEa2h6dnlnWiIsInN1YiI6IjEwNyIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.HkuExb4EUIy46sHzMnNJCRK-Ob58jeJVXq7Ls6e_Usk"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"id\":107\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "caf1c63d-6af2-490e-a480-3ad2d585ad6f",
+            "colId": "3cd34dcb-dfca-4b70-aa04-4cf0a594e787",
+            "containerId": "",
+            "name": "all-data",
+            "url": "http://127.0.0.1:8000/api/all-data",
+            "method": "POST",
+            "sortNum": 480000,
+            "created": "2023-03-26T12:54:07.966Z",
+            "modified": "2023-03-26T12:54:07.966Z",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNjc4NTkzNDA3LCJleHAiOjE2Nzg1OTcwMDcsIm5iZiI6MTY3ODU5MzQwNywianRpIjoiT21uWVdyOUdFUmJWSEVoMSIsInN1YiI6IjYyIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.EzHWBX4nHQcOOWg-3o57ckT3qO3YCt-jQAAzh9W18EE"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"appId\":\"app_63e26c099ca4e\"\n}",
+                "form": []
+            },
+            "tests": []
+        }
+    ]
+}
