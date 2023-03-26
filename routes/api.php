@@ -75,7 +75,7 @@ Route::post('register', [AuthController::class, 'register']);//creating reseller
 
     Route::get('reseller/all', [ResellerController::class, 'allReseller']);
     Route::get('reseller/delete/{id}', [ResellerController::class, 'deleteReseller']);
-    Route::post('reseller/store', [ResellerController::class, 'storeReseller']);
+    Route::post('reseller/store', [ResellerController::class, 'storeReseller']);//now useful
     Route::post('reseller/update', [ResellerController::class, 'updateReseller']);
 
     Route::post('notification/add', [NotificationController::class, 'addNotification']);

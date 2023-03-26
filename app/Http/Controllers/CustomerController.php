@@ -44,8 +44,8 @@ class CustomerController extends Controller
             $data->customer_type = $request->customer_type;
             $data->username = $request->username;
             // $data->password = $request->password;
-            // $data->password = Hash::make($request->password);
-            $data->password = Crypt::encrypt($request->password);
+            $data->password = Hash::make($request->password);
+            $data->temp_pass = Crypt::encrypt($request->password);
             $data->reseller_id = $request->reseller_id;
             $platform = $request->platform;
 
@@ -65,7 +65,7 @@ class CustomerController extends Controller
 
             $data->save();
             $existing_reseller =  User::where('id', $request->reseller_id)->first();
-            if($existing_reseller->role_id == "0"){
+            if(isset($existing_reseller->role_id) && $existing_reseller->role_id == "0"){
                 $data->save();
                 $remark = "$request->points point added by $existing_reseller->name to $request->username";
                 $result = $this->pointHistoryController->addPoints($request->reseller_id, $data->id, $request->points, $remark,$platform);
@@ -73,7 +73,7 @@ class CustomerController extends Controller
             }else{
                 $addpoint=$request->points;
                 if($platform=="ios"){
-                    $existing_reseller_point=$existing_reseller->ios_point;
+                    $existing_reseller_point=$existing_reseller->ios_point??0;
                     if($addpoint > $existing_reseller_point){
                         return response()->json(["message"=>"you do not have enough point to add"]);
                     }else{
@@ -82,7 +82,7 @@ class CustomerController extends Controller
                     }
     
                 }else{
-                    $existing_reseller_point=$existing_reseller->android_point;
+                    $existing_reseller_point=$existing_reseller->android_point??0;
                     if($addpoint > $existing_reseller_point){
                         return response()->json(["message"=>"you do not have enough point to add"]);
                     }else{
@@ -446,7 +446,7 @@ class CustomerController extends Controller
 
         if ($platform == "ios" || $platform == "mac") {
             $user = Customer::where('username', $name)->first();
-            if ($user->password == $password) {
+            if (Crypt::decrypt($user->temp_pass) == $password) {
 
                 $todaysdate = Date('Y-m-d');
                 $todaysdatesec = strtotime($todaysdate);
@@ -511,11 +511,9 @@ class CustomerController extends Controller
                 ], 400);
             }
         } else {
-            $user = Customer::where('username', $name)->first();
-            if ($user->password == $password) {
 
                 $user = Customer::where('username', $name)->first();
-                if ($user->password == $password) {
+                if (Crypt::decrypt($user->temp_pass) == $password) {
 
                     $todaysdate = Date('Y-m-d');
                     $todaysdatesec = strtotime($todaysdate);
@@ -577,7 +575,6 @@ class CustomerController extends Controller
                         'message' => 'Login  fail!',
                     ], 400);
                 }
-            }
         }
     }
 

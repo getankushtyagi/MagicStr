@@ -29,8 +29,8 @@ class AuthController extends Controller
                 'password' => 'required|string',
             ]);
             $credentials = $request->only('user_name', 'password');
-            
-            
+
+
             $token = Auth::attempt($credentials);
             // dd('chck',$token);
             if (!$token) {
@@ -43,7 +43,11 @@ class AuthController extends Controller
             // $update = User::where('appId', $user->appId)->update([
             //     'login_status' => '1'
             // ]);
-            $data = Customer::where('reseller_id', $user->id)->get();
+            $data=[];
+            if(isset($user->id)){
+
+                $data = Customer::where('reseller_id', $user->id)->get();
+            }
             return response()->json([
                 'status' => true,
                 'user' => $user,
@@ -58,7 +62,7 @@ class AuthController extends Controller
         } catch (Exception $th) {
             dd($th);
         }
-        
+
     }
     
     public function login_bk(Request $request)
@@ -280,21 +284,84 @@ class AuthController extends Controller
         $id = $request->appId;
         $rid = $request->rid;
         $point = $request->points;
-        // $resellerEndDate = $request->reseller_end_date;
-        // $userEndDate = $request->user_end_date;
+        $platform = $request->platform;
 
         $user = User::where('appId', $id)->first();
-
         $resellerUser = User::where('id', $rid)->first();
-        // $resellerUser->end_date = $resellerEndDate;
-        $resellerUser->save();
+
+        if($platform == "ios"){
+            if($user['ios_point'] == 0){
+                return response()->json([
+                    'status' => true,
+                    'message' => 'user do not have any point'
+                ]);
+            }else{
+                if($resellerUser->role_id==0){
+                    if($point > $user->ios_point){
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'user do not have enough point to reverse'
+                        ]);
+                    }else{
+                        $user->ios_point -= $point;
+                        $user->save();
+                    }
+                }
+                else{
+                    if($point > $user->ios_point){
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'user do not have enough point to reverse'
+                        ]);
+                    }else{
+                        $user->ios_point -= $point;
+                        $resellerUser += $point;
+                        $user->save();
+                        $resellerUser->save();
+                    }
+                }
+            }
+        }else{
+
+            if($user['android_point'] == 0){
+                return response()->json([
+                    'status' => true,
+                    'message' => 'user do not have any point'
+                ]);
+            }else{
+                if($resellerUser->role_id==0){
+                    if($point > $user->android_point){
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'user do not have enough point to reverse'
+                        ]);
+                    }else{
+                        $user->android_point -= $point;
+                        $user->save();
+                    }
+                }
+                else{
+                    if($point > $user->android_point){
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'user do not have enough point to reverse'
+                        ]);
+                    }else{
+                        $user->android_point -= $point;
+                        $resellerUser += $point;
+                        $user->save();
+                        $resellerUser->save();
+                    }
+                }
+            }
+        }
 
         $remark = "$point point reversed by $resellerUser->name from $user->name";
-        $result = $this->pointHistoryController->addPoints($resellerUser->id, $user->id, $request->points, $remark);
+        $result = $this->pointHistoryController->addPoints($resellerUser->id, $user->id, $request->points, $remark,$platform);
 
-        $user->point_history = "0";
+        // $user->point_history = "0";
         // $user->end_date = $userEndDate;
-        $user->save();
+        // $user->save();
         if ($result) {
             return response()->json([
                 'status' => true,
@@ -322,17 +389,8 @@ class AuthController extends Controller
         $user->appId = 'app_' . uniqid();
         $user->name = $request->name ?? "";
         $user->user_name = $request->user_name;
-        // $user->password = Hash::make($request->password);
-        $user->password = Crypt::encrypt($request->password);
-        // dump(Crypt::decrypt($request->password));
-        //remove temp_pass
-            // $user->temp_pass = $request->password;
-        //remove login_status
-            // $user->login_status = '0';
-        //remove start date end date
-            // $user->start_date = $request->start_date;
-            // $user->end_date = $request->end_date;
-
+        $user->password = Hash::make($request->password);
+        $user->temp_pass = Crypt::encrypt($request->password);
         $user->image_index = $request->image_index ?? 0;
         $user->role_id = $request->role_id ?? 1;
         $user->reseller_id = $request->reseller_id;
@@ -351,7 +409,7 @@ class AuthController extends Controller
         // dd($existing_reseller);
         //remove reseller endate
         // $existing_reseller->end_date = $request->reseller_end_date;
-        if($existing_reseller->role_id == "0"){
+        if(isset($existing_reseller->role_id) && $existing_reseller->role_id == 0){
             $user->save();
             $remark = "$request->points point added by $existing_reseller->name to $request->user_name";
             $result = $this->pointHistoryController->addPoints($request->reseller_id, $user->id, $request->points, $remark,$platform);
@@ -374,7 +432,7 @@ class AuthController extends Controller
         }else{
             $addpoint=$request->points;
             if($platform=="ios"){
-                $existing_reseller_point=$existing_reseller->ios_point;
+                $existing_reseller_point=$existing_reseller->ios_point??0;
                 if($addpoint > $existing_reseller_point){
                     return response()->json(["message"=>"you do not have enough point to add"]);
                 }else{
@@ -383,7 +441,7 @@ class AuthController extends Controller
                 }
 
             }else{
-                $existing_reseller_point=$existing_reseller->android_point;
+                $existing_reseller_point=$existing_reseller->android_point??0;
                 if($addpoint > $existing_reseller_point){
                     return response()->json(["message"=>"you do not have enough point to add"]);
                 }else{
